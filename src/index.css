@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+
+  /* Color Palette: #04364a, #176b87, #64ccc5, #dafffb */
+
+  --color-brand-primary: #04364A;
+  --color-brand-secondary: #176B87;
+  --color-brand-accent: #64CCC5;
+  --color-brand-light: #DAFFFB;
+
+  --color-primary-dark: #04364A;
+  --color-primary-main: #176B87;
+  --color-accent-teal: #64CCC5;
+  --color-surface-light: #DAFFFB;
+
+  --color-primary-50: #dafffb;
+  --color-primary-100: #b5ece6;
+  --color-primary-200: #8fdcd3;
+  --color-primary-300: #64ccc5;
+  --color-primary-400: #3eaeb1;
+  --color-primary-500: #176b87;
+  --color-primary-600: #115973;
+  --color-primary-700: #0a475f;
+  --color-primary-800: #04364a;
+  --color-primary-900: #022636;
+
+  --color-accent-orange: #64CCC5;
+  --color-accent-orange-hover: #176B87;
+  --color-accent-green: #10b981;
+}
+
+:root {
+  --brand-primary: var(--color-brand-primary);
+  --brand-secondary: var(--color-brand-secondary);
+  --brand-accent: var(--color-brand-accent);
+  --brand-light: var(--color-brand-light);
+
+  /* Mapping to existing tailwind.config.js variables (if used) */
+  --primary-50: var(--color-primary-50);
+  --primary-100: var(--color-primary-100);
+  --primary-200: var(--color-primary-200);
+  --primary-300: var(--color-primary-300);
+  --primary-400: var(--color-primary-400);
+  --primary-500: var(--color-primary-500);
+  --primary-600: var(--color-primary-600);
+  --primary-700: var(--color-primary-700);
+  --primary-800: var(--color-primary-800);
+  --primary-900: var(--color-primary-900);
+
+  --accent-orange: var(--color-accent-gold);
+  --accent-orange-hover: var(--color-accent-gold-hover);
+  --accent-green: #10b981;
+  /* Placeholder if needed */
+
+  color: var(--color-primary-800);
+}
+
+body {
+  @apply font-sans;
+  background-color: var(--color-surface-beige);
+  color: var(--color-primary-800);
+}
+
+/* Hide browser's native password reveal button */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}
+
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+
+@layer utilities {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl shadow-[#04364A]/5;
+  }
+
+  .glass-dark {
+    @apply bg-[#04364A]/80 backdrop-blur-xl border border-white/10;
+  }
+
+  .premium-gradient {
+    background: linear-gradient(135deg, #04364A 0%, #176B87 100%);
+  }
+
+  .accent-gradient {
+    background: linear-gradient(135deg, #64CCC5 0%, #176B87 100%);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#04364A] to-[#64CCC5];
+  }
+
+  .soft-shadow {
+    box-shadow: 0 20px 50px -12px rgba(4, 54, 74, 0.1);
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .rotate-y-12 {
+    transform: rotateY(12deg);
+  }
+}
+
+.font-display {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #176B87;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #04364A;
+}
+
+/* Specific sidebar scroll style */
+.custom-sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #DAFFFB;
+  border-radius: 10px;
+}
+
+.custom-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64CCC5;
+}
