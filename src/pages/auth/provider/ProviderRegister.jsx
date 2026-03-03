@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import StepInfo from '@/components/auth/StepInfo'
 import StepServices from '@/components/auth/StepServices'
+import toast from 'react-hot-toast';
 import { API_ENDPOINTS, COMMON_HEADERS } from '@/config/api';
 
 import { Link } from 'react-router-dom'
@@ -181,7 +182,7 @@ const ProviderRegister = () => {
 
     } catch (error) {
       console.error("Provider registration error:", error);
-      alert("An error occurred. Please check your connection and make sure your backend server (ngrok) is running.");
+      toast.error("An error occurred. Please check your connection.");
     } finally {
       setLoading(false);
     }
@@ -195,9 +196,9 @@ const ProviderRegister = () => {
 
       // Check if it's an ngrok error
       if (text.includes('ngrok') || text.includes('ERR_NGROK')) {
-        alert("⚠️ Your backend server (ngrok tunnel) appears to be offline. Please restart it and try again.");
+        toast.error("⚠️ Backend server appears to be offline.");
       } else {
-        alert(`Registration failed with status ${response.status}. Check console for details.`);
+        toast.error(`Registration failed with status ${response.status}`);
       }
       return;
     }
@@ -216,7 +217,7 @@ const ProviderRegister = () => {
     }
 
     if (response.ok) {
-      alert("✅ Provider Registration successful!");
+      toast.success("✅ Provider Registration successful!");
       localStorage.removeItem('provider_reg_data');
     } else {
       // Show the specific error message from the backend
@@ -233,9 +234,9 @@ const ProviderRegister = () => {
         }
 
         const firstError = data.errors[0]?.msg || "Validation failed";
-        alert(`❌ Registration failed: ${firstError}`);
+        toast.error(`❌ Registration failed: ${firstError}`);
       } else {
-        alert(`❌ Registration failed: ${data.message || "Unknown error"}`);
+        toast.error(`❌ Registration failed: ${data.message || "Unknown error"}`);
       }
     }
   };

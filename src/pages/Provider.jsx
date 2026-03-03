@@ -8,17 +8,38 @@ import { GrServices } from "react-icons/gr";
 import { MdOutlineEventAvailable, MdManageAccounts, MdAdminPanelSettings } from "react-icons/md";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { HiMenuAlt2, HiX } from "react-icons/hi";
+import { serviceService } from "../services";
+import toast from 'react-hot-toast';
+import { AlertCircle } from "lucide-react";
 
 export default function Provider() {
   const [openMenu, setOpenMenu] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [points, setPoints] = useState(0);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userData");
-    if (storedUser) setUserData(JSON.parse(storedUser));
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      setUserData(parsed);
+      
+      const fetchPoints = async () => {
+        try {
+          const data = await serviceService.getProviderData();
+          if (data && data.points !== undefined) {
+             setPoints(data.points);
+          }
+        } catch (error) {
+          console.error("Error fetching provider points:", error);
+        }
+      };
+      
+      fetchPoints();
+    }
   }, []);
 
   const toggleMenu = (menu) => {
@@ -27,6 +48,7 @@ export default function Provider() {
 
   const handleLogout = () => {
     localStorage.clear();
+    toast.success('Logged out successfully');
     navigate("/login");
   };
 
@@ -77,8 +99,8 @@ export default function Provider() {
                   {userData.name?.[0]?.toUpperCase() || "U"}
                 </span>
               </div>
-              <div>
-                <p className="text-sm truncate">{userData.email}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm break-all">{userData.email}</p>
                 <span className="text-xs text-brand-secondary px-2 py-0.5 bg-brand-primary/20 rounded mt-1 capitalize">
                   {localStorage.getItem("userRole") || "provider"}
                 </span>
@@ -95,7 +117,7 @@ export default function Provider() {
                 <span>Points</span>
               </div>
               <span className="bg-red-500 px-2 py-0.5 rounded-full text-xs">
-                545 LE
+                {points} LE
               </span>
             </li>
 
@@ -120,7 +142,7 @@ export default function Provider() {
               {openMenu === "service" && (
                 <ul className="ms-8 mt-1 space-y-1 text-sm">
                   <li>
-                    <Link to="/provider/serviceList" className="block hover:text-brand-secondary hover:bg-brand-primary focus:bg-brand-primary/80">
+                    <Link to="/provider/serviceList" className="block hover:text-brand-secondary hover:bg-brand-primary focus:bg-sky-800/80">
                       • Services List
                     </Link>
                   </li>
@@ -173,7 +195,7 @@ export default function Provider() {
           {/* Logout */}
           <div className="p-4 border-t border-white/10">
             <button
-              onClick={handleLogout}
+              onClick={() => setShowLogoutModal(true)}
               className="w-full py-2 text-center rounded hover:bg-red-500/20 text-white hover:text-red-500"
             >
               Logout 
@@ -187,6 +209,36 @@ export default function Provider() {
       <main className="flex-1 sm:ml-60 p-4">
         <Outlet />
       </main>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowLogoutModal(false)}></div>
+          <div className="bg-white rounded-[2rem] shadow-2xl max-w-sm w-full relative z-[110] p-8 text-center animate-in zoom-in duration-300">
+            <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle size={40} className="text-red-500" />
+            </div>
+            <h3 className="text-2xl font-black text-sky-900 mb-3">Sign Out?</h3>
+            <p className="text-gray-500 mb-8 font-medium leading-relaxed">
+              Are you sure you want to log out of your provider dashboard?
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 px-4 py-3 bg-gray-100 text-sky-900 font-bold rounded-2xl hover:bg-gray-200 transition-colors uppercase tracking-widest text-[11px]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 px-4 py-3 bg-[#04364A] text-white font-bold rounded-2xl hover:bg-[#04364A]/90 shadow-lg shadow-[#04364A]/20 transition-all uppercase tracking-widest text-[11px]"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

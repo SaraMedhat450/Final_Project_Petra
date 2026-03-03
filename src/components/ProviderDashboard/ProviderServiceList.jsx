@@ -216,7 +216,7 @@ export default function ProviderServiceList() {
         ) : error ? (
           <div className="text-center py-20 text-red-500">{error}</div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="">
             <table className="w-full text-center text-body">
               <thead className="bg-[#04364A] text-white font-medium text-medium">
                 <tr>
@@ -270,9 +270,9 @@ export default function ProviderServiceList() {
 
                       {/* Dropdown */}
                       {openDropdownId === service.id && (
-                        <div className={`absolute right-0 z-50 bg-white rounded-md shadow-xl w-36 border border-gray-100 py-1 font-normal ${
-                          index >= currentEntries.length - 2 && currentEntries.length > 2 
-                          ? 'bottom-full mb-1' 
+                        <div className={`absolute right-0 z-[100] bg-white rounded-md shadow-2xl w-36 border border-gray-100 py-1 font-normal ${
+                          index >= currentEntries.length - 3 && currentEntries.length > 3 
+                          ? 'bottom-full mb-2' 
                           : 'top-full mt-1'
                         }`}>
                           <Link

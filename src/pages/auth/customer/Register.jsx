@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { API_ENDPOINTS, COMMON_HEADERS } from "@/config/api";
 
 const Register = () => {
@@ -100,7 +101,7 @@ const Register = () => {
         }
 
         if (response.ok) {
-          alert("Registration Successful!");
+          toast.success("Registration Successful! Please login.");
           navigate("/login");
         } else {
           // Log the raw data so we can see the exact validation error
@@ -113,12 +114,12 @@ const Register = () => {
             });
             setErrors(backendErrors);
           } else {
-            alert(data.message || "Registration failed. Check console for details.");
+            toast.error(data.message || "Registration failed.");
           }
         }
       } catch (error) {
         console.error("Registration error:", error);
-        alert("An error occurred. Please check your connection.");
+        toast.error("An error occurred. Please check your connection.");
       } finally {
         setLoading(false);
       }

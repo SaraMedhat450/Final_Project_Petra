@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 
 import { useDispatch } from "react-redux";
@@ -61,18 +62,24 @@ const Login = () => {
 
       // Check if response is JSON
       const contentType = res.headers.get("content-type");
-      let data;
+      let data = {};
+      
       if (contentType && contentType.includes("application/json")) {
         data = await res.json();
-      } else {
+      } else if (!res.ok) {
+        // If not JSON and not OK, get text for debugging but don't throw yet
         const errorText = await res.text();
-        console.error("Server returned non-JSON response:", errorText);
-        throw new Error("Received unexpected response from server. Check console for details.");
+        console.error("Server returned non-JSON error:", errorText);
+      } else {
+        // If OK but not JSON, this is unexpected
+        const errorText = await res.text();
+        throw new Error("Received non-JSON response from server.");
       }
 
       if (!res.ok) {
-        const errorMsg = data.message || "Invalid email or password";
+        const errorMsg = data?.message || "Invalid email or password";
         setErrors({ api: errorMsg });
+        toast.error(errorMsg);
         dispatch(loginFailure(errorMsg));
         return;
       }
@@ -90,22 +97,25 @@ const Login = () => {
             role: data.role_name || data.role,
           },
           token: data.token,
-          role: data.role_name || data.role, // Handle potential variations in key
+          role: data.role_name || data.role,
         })
       );
+      
+      toast.success("Login successful!");
 
       const userRole = data.role_name || data.role;
       if (userRole === "customer") {
         navigate("/customer/main");
       } else if (userRole === "provider") {
-        navigate("/provider/main");
+        navigate("/provider/serviceList");
       } else {
         navigate("/");
       }
     } catch (error) {
-      console.error(error);
-      const errorMsg = "Something went wrong, try again";
+      console.error("Login catch error:", error);
+      const errorMsg = error.message || "Something went wrong, try again";
       setErrors({ api: errorMsg });
+      toast.error(errorMsg);
       dispatch(loginFailure(errorMsg));
     } finally {
       setLoading(false);

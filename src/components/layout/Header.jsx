@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { User, LogOut, Menu, X, Search, Bell, ChevronDown } from 'lucide-react';
+import { User, LogOut, Menu, X, Search, Bell, ChevronDown, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { API_ENDPOINTS, UPLOAD_URL } from '@/config/api';
+import { logout as logoutAction } from '@/store/slices/authSlice';
 
 const UserAvatar = ({ user }) => {
     let src = null;
@@ -35,6 +37,7 @@ const UserAvatar = ({ user }) => {
 const Header = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSignUpDropdownOpen, setIsSignUpDropdownOpen] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const { isAuthenticated, user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -43,7 +46,7 @@ const Header = () => {
         if (!isAuthenticated || !user) return '/login';
         // Check role from user object or localStorage as fallback
         const role = user.role || localStorage.getItem('userRole');
-        if (role === 'provider') return '/provider/main';
+        if (role === 'provider') return '/provider/serviceList';
         if (role === 'customer') return '/customer/main';
         return '/profile';
     };
@@ -56,10 +59,10 @@ const Header = () => {
         { name: 'CONTACT US', path: '/contact' },
     ];
 
-    const logout = () => ({ type: 'LOGOUT' }); // Simple logout action if not defined
-
     const handleLogout = () => {
-        dispatch(logout());
+        dispatch(logoutAction());
+        toast.success("Logged out successfully");
+        setShowLogoutModal(false);
         navigate('/login');
     };
 
@@ -110,7 +113,7 @@ const Header = () => {
                                         <p className="text-[10px] font-black uppercase tracking-widest text-[#04364A]">{user?.name?.split(' ')[0]}</p>
                                     </div>
                                 </Link>
-                                <button onClick={handleLogout} className="text-[#04364A]/60 hover:text-red-500 transition-colors">
+                                <button onClick={() => setShowLogoutModal(true)} className="text-[#04364A]/60 hover:text-red-500 transition-colors">
                                     <LogOut size={18} />
                                 </button>
                             </div>
@@ -195,6 +198,35 @@ const Header = () => {
                         ) : (
                             <button onClick={handleLogout} className="w-full text-center py-5 text-red-500 font-black border-2 border-red-50 rounded uppercase tracking-widest text-[10px]">LOGOUT</button>
                         )}
+                    </div>
+                </div>
+            )}
+            {/* Logout Confirmation Modal */}
+            {showLogoutModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowLogoutModal(false)}></div>
+                    <div className="bg-white rounded-[2rem] shadow-2xl max-w-sm w-full relative z-[110] p-8 text-center animate-in zoom-in duration-300">
+                        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <AlertCircle size={40} />
+                        </div>
+                        <h3 className="text-2xl font-black text-[#04364A] mb-3">Sign Out?</h3>
+                        <p className="text-gray-500 mb-8 font-medium leading-relaxed">
+                            Are you sure you want to log out of your account?
+                        </p>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => setShowLogoutModal(false)}
+                                className="flex-1 px-4 py-3 bg-gray-100 text-[#04364A] font-bold rounded-2xl hover:bg-gray-200 transition-colors uppercase tracking-widest text-[10px]"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleLogout}
+                                className="flex-1 px-4 py-3 bg-[#04364A] text-white font-bold rounded-2xl hover:bg-[#04364A]/90 shadow-lg shadow-[#04364A]/20 transition-all uppercase tracking-widest text-[10px]"
+                            >
+                                Logout
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

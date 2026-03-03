@@ -95,7 +95,7 @@ function App() {
               <Provider />
             </ProtectedRoute>
           }>
-            <Route index element={<ProviderPoints />} />
+            <Route index element={<ProviderServiceList />} />
             <Route path="points" element={<ProviderPoints />} />
             <Route path="main" element={<ProviderMain />} />
             <Route path="serviceList" element={<ProviderServiceList />} />

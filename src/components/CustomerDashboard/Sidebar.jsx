@@ -9,11 +9,15 @@ import {
 import { MdAdminPanelSettings, MdManageAccounts, MdOutlineEventAvailable } from "react-icons/md";
 import { IoChevronDown, IoChevronUp, IoHome } from "react-icons/io5";
 import { FiMenu } from "react-icons/fi";
+import toast from 'react-hot-toast';
+import { AlertCircle } from "lucide-react";
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const handleLogout = () => {
     localStorage.clear();
+    toast.success('Logged out successfully');
     navigate("/login");
   };
 
@@ -53,8 +57,8 @@ export default function Sidebar() {
                 {userData.name?.[0]?.toUpperCase() || "U"}
               </span>
             </div>
-            <div>
-              <p className="text-sm truncate">{userData.email}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm break-all">{userData.email}</p>
               <span className="text-xs text-brand-secondary px-2 py-0.5 bg-brand-primary/20 rounded mt-1 capitalize">
                 {localStorage.getItem("userRole") || "customer"}
               </span>
@@ -131,7 +135,7 @@ export default function Sidebar() {
         {/* Logout */}
         <div className="p-4 border-t border-white/10">
             <button
-              onClick={handleLogout}
+              onClick={() => setShowLogoutModal(true)}
               className="w-full py-2 text-center rounded hover:bg-red-500/20 text-white hover:text-red-500"
             >
               Logout 
@@ -139,6 +143,36 @@ export default function Sidebar() {
             </button>
           </div>
       </aside>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowLogoutModal(false)}></div>
+          <div className="bg-white rounded-[2rem] shadow-2xl max-w-sm w-full relative z-[110] p-8 text-center animate-in zoom-in duration-300">
+            <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle size={40} className="text-red-500" />
+            </div>
+            <h3 className="text-2xl font-black text-sky-900 mb-3">Sign Out?</h3>
+            <p className="text-gray-500 mb-8 font-medium leading-relaxed">
+              Are you sure you want to log out of your customer dashboard?
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 px-4 py-3 bg-gray-100 text-sky-900 font-bold rounded-2xl hover:bg-gray-200 transition-colors uppercase tracking-widest text-[11px]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 px-4 py-3 bg-[#04364A] text-white font-bold rounded-2xl hover:bg-[#04364A]/90 shadow-lg shadow-[#04364A]/20 transition-all uppercase tracking-widest text-[11px]"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
