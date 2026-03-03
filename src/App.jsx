@@ -42,10 +42,11 @@ import Cashback from "./components/CustomerDashboard/Cashback";
 import Main from "./components/CustomerDashboard/Main";
 import Profile from './components/Profile'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import { HashRouter } from "react-router-dom";
 
 function App() {
   return (
-    <Router>
+    <HashRouter>
       <Toaster position="top-center" reverseOrder={false} />
       <Layout>
         <Routes>
@@ -110,7 +111,7 @@ function App() {
           </Route>
         </Routes>
       </Layout>
-    </Router>
+    </HashRouter>
   )
 }
 
