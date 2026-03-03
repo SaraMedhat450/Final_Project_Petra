@@ -10,6 +10,7 @@ import ProviderRegister from './pages/auth/provider/ProviderRegister'
 import Login from './pages/auth/Login'
 import Home from './pages/home/Home'
 import Categories from './pages/category/Categories'
+import SubCategories from './pages/category/SubCategories'
 import Services from './pages/services/Services'
 import ProviderDetail from './pages/providerWebsite/ProviderDetail'
 import Providers from './pages/providerWebsite/Providers'
@@ -50,6 +51,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/subcategories" element={<SubCategories />} />
           <Route path="/services" element={<Services />} />
           <Route path="/service/:id" element={<ServiceDetail />} />
           <Route path="/book/:id" element={<BookService />} />

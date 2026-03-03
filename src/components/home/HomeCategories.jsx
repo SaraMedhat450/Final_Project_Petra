@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LayoutGrid, ChevronLeft, ChevronRight, Star, Sparkles } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
@@ -10,6 +11,7 @@ import 'swiper/css/navigation';
 import { UPLOAD_URL } from '@/config/api';
 
 const HomeCategories = ({ categories, loading, selectedCategories, onSelectCategory }) => {
+  const navigate = useNavigate();
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-pulse px-6 py-24">
@@ -44,7 +46,7 @@ const HomeCategories = ({ categories, loading, selectedCategories, onSelectCateg
                 </button>
              </div>
              <button 
-                 onClick={() => onSelectCategory('All')}
+                 onClick={() => navigate('/categories')}
                  className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#04364A] hover:text-[#04364A] transition-all"
              >
                See All
@@ -85,7 +87,7 @@ const HomeCategories = ({ categories, loading, selectedCategories, onSelectCateg
               return (
                 <SwiperSlide key={cat.id}>
                   <div 
-                    onClick={() => onSelectCategory(cat.name)}
+                    onClick={() => navigate(`/subcategories?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`)}
                     className={`group relative h-[480px] rounded-[3rem] p-5 flex flex-col cursor-pointer transition-all duration-500 ${
                       isActive 
                         ? 'bg-[#04364A] shadow-2xl scale-[1.02] z-10' 

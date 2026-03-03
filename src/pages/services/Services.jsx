@@ -22,14 +22,16 @@ const Services = () => {
     // --- Filter & UI State ---
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedSubcategory, setSelectedSubcategory] = useState('All');
     const [selectedArea, setSelectedArea] = useState('All');
-    const [priceRange, setPriceRange] = useState([0, 100000]); // Max 100k
+    const [priceRange, setPriceRange] = useState([0, 100000]); 
     const [sortBy, setSortBy] = useState('Newest');
     const [viewMode, setViewMode] = useState('grid');
     const [showFilters, setShowFilters] = useState(false);
     
     // --- Store URL Categories for Resolution ---
     const [pendingCategoryName, setPendingCategoryName] = useState(null);
+    const [pendingSubcategoryId, setPendingSubcategoryId] = useState(null);
 
     // --- Pagination State ---
     const [currentPage, setCurrentPage] = useState(1);
@@ -40,9 +42,14 @@ const Services = () => {
         const params = new URLSearchParams(location.search);
         const catParam = params.get('category');
         const searchParam = params.get('search');
+        const subCatIdParam = params.get('subcategoryId');
         
         if (catParam) setPendingCategoryName(catParam);
         if (searchParam) setSearchQuery(searchParam);
+        if (subCatIdParam) {
+            setPendingSubcategoryId(subCatIdParam);
+            setSelectedSubcategory(subCatIdParam);
+        }
     }, [location.search]);
 
     // 2. Fetch All Required Data
@@ -79,14 +86,34 @@ const Services = () => {
                     const data = await subRes.json();
                     fetchedSubs = (data.subcategories || data || []).filter(s => s.status === 'active');
                     
-                    // Also check subcategories for URL match if category didn't match
-                    if (pendingCategoryName && selectedCategory === 'All') {
-                         const matchedSub = fetchedSubs.find(s => s.name.toLowerCase().trim() === pendingCategoryName.toLowerCase().trim());
-                         if (matchedSub) {
-                            // Note: We search by subcategory name/ID. 
-                            // Since our sidebar doesn't show subcategories yet, we set the selection to this ID
-                            setSelectedCategory(matchedSub.id); 
-                         }
+                    // Priority resolution for URL params
+                    const params = new URLSearchParams(location.search);
+                    const urlCatName = params.get('category');
+                    const urlSubId = params.get('subcategoryId');
+
+                    // A. If we have subcategoryId in URL, find its parent and set both
+                    if (urlSubId) {
+                        const matchedSub = fetchedSubs.find(s => String(s.id) === String(urlSubId));
+                        if (matchedSub) {
+                            setSelectedSubcategory(String(matchedSub.id));
+                            if (matchedSub.categoryId) setSelectedCategory(String(matchedSub.categoryId));
+                        }
+                    } 
+                    // B. Else if we only have category name (could be a subcategory or category)
+                    else if (urlCatName) {
+                        const lowCatName = urlCatName.toLowerCase().trim();
+                        const matchedCat = fetchedCats.find(c => c.name.toLowerCase().trim() === lowCatName);
+                        
+                        if (matchedCat) {
+                            setSelectedCategory(matchedCat.id);
+                        } else {
+                            // Check if it's a subcategory name
+                            const matchedSub = fetchedSubs.find(s => s.name.toLowerCase().trim() === lowCatName);
+                            if (matchedSub) {
+                                setSelectedSubcategory(String(matchedSub.id));
+                                if (matchedSub.categoryId) setSelectedCategory(String(matchedSub.categoryId));
+                            }
+                        }
                     }
                 }
 
@@ -213,7 +240,12 @@ const Services = () => {
     // 5. Reset page when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery, selectedCategory, selectedArea, priceRange, sortBy]);
+    }, [searchQuery, selectedCategory, selectedSubcategory, selectedArea, priceRange, sortBy]);
+
+    const handleCategoryChange = (catId) => {
+        setSelectedCategory(catId);
+        setSelectedSubcategory('All');
+    };
 
     // 3. Optimized Filtering & Sorting logic
     const filteredServices = useMemo(() => {
@@ -225,9 +257,18 @@ const Services = () => {
                 const sCatId = s.categoryId ? String(s.categoryId) : '';
                 const sSubId = s.subcategoryId ? String(s.subcategoryId) : '';
                 const selCatId = selectedCategory !== 'All' ? String(selectedCategory) : 'All';
+                const selSubId = selectedSubcategory !== 'All' ? String(selectedSubcategory) : 'All';
                 
-                // Match if Category ID is 'All' OR match against categoryId OR subcategoryId
-                const matchesCategory = selCatId === 'All' || sCatId === selCatId || sSubId === selCatId;
+                // Match Logic:
+                // 1. If Subcategory is selected -> must match subcategoryId
+                // 2. Else if Category is selected -> must match categoryId
+                // 3. Else if 'All' -> pass
+                let matchesCategory = true;
+                if (selSubId !== 'All') {
+                    matchesCategory = sSubId === selSubId;
+                } else if (selCatId !== 'All') {
+                    matchesCategory = sCatId === selCatId;
+                }
 
                 const matchesArea = selectedArea === 'All' || 
                     s.city.toLowerCase().trim() === selectedArea.toLowerCase().trim();
@@ -252,6 +293,7 @@ const Services = () => {
     const resetFilters = () => {
         setSearchQuery('');
         setSelectedCategory('All');
+        setSelectedSubcategory('All');
         setSelectedArea('All');
         setPriceRange([0, 100000]);
         setSortBy('Newest');
@@ -265,7 +307,7 @@ const Services = () => {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
+                setSelectedCategory={handleCategoryChange}
                 categories={categories}
                 showFilters={showFilters}
                 setShowFilters={setShowFilters}
@@ -275,7 +317,7 @@ const Services = () => {
                 <ServiceSidebar 
                     categories={categories}
                     selectedCategory={selectedCategory}
-                    setSelectedCategory={setSelectedCategory}
+                    setSelectedCategory={handleCategoryChange}
                     areas={areas}
                     selectedArea={selectedArea}
                     setSelectedArea={setSelectedArea}

@@ -18,7 +18,7 @@ const CategoryCard = ({ category }) => {
 
     return (
         <Link 
-            to={`/services?category=${encodeURIComponent(category.name)}`}
+            to={`/subcategories?categoryId=${category.id}&categoryName=${encodeURIComponent(category.name)}`}
             className="group relative h-[400px] rounded-[2.5rem] flex flex-col cursor-pointer transition-all duration-500 bg-[#F0F9F9] hover:shadow-2xl hover:-translate-y-2 overflow-hidden border border-gray-100"
         >
             {/* Image - Full Width, Compact Height */}
