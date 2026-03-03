@@ -26,6 +26,9 @@ export const API_ENDPOINTS = {
   BOOKINGS: `${BASE_URL}/booking`,
   BOOKING_DETAILS: (id) => `${BASE_URL}/booking/${id}`,
   BOOKING_STATUS: (id) => `${BASE_URL}/booking/${id}/status`,
+
+  // Customer Points
+  CUSTOMER_POINTS: `${BASE_URL}/customer/points`,
 };
 
 export const COMMON_HEADERS = {

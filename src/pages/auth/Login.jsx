@@ -105,7 +105,7 @@ const Login = () => {
 
       const userRole = data.role_name || data.role;
       if (userRole === "customer") {
-        navigate("/customer/main");
+        navigate("/customer/booking");
       } else if (userRole === "provider") {
         navigate("/provider/serviceList");
       } else {

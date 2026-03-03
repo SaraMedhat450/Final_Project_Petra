@@ -59,7 +59,8 @@ const serviceService = {
 
     updateService: async (id, serviceData) => {
         try {
-            const response = await api.put(`/service/${id}`, serviceData);
+            // Using POST with _method: PUT is more reliable for FormData/File uploads
+            const response = await api.post(`/service/${id}`, serviceData);
             return response.data;
         } catch (error) {
             console.error('Error updating service:', error.response?.data || error.message);

@@ -25,6 +25,9 @@ export default function AddNewService() {
   const [pricingType, setPricingType] = useState("");
   const [state, setState] = useState("");
   const [description, setDescription] = useState("");
+  const [status, setStatus] = useState("");
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [showReasonModal, setShowReasonModal] = useState(false);
 
   const [selectedDay, setSelectedDay] = useState("Sunday");
 
@@ -72,7 +75,7 @@ export default function AddNewService() {
         try {
           const res = await serviceService.getAllServices();
           const service = res.data?.find(s => s.id === parseInt(id)) || res?.find(s => s.id === parseInt(id));
-          
+
           if (service) {
             setCategory(service.categoryId);
             setSubCategory(service.subcategoryId);
@@ -82,7 +85,8 @@ export default function AddNewService() {
             setCommission(service.commission_fee);
             setDescription(service.description);
             setState(service.state || "active");
-            // For now, let's keep the image as it is or handle if it's external
+            setStatus(service.status || "pending");
+            setRejectionReason(service.rejectionReason || "");
             if (service.images && service.images.length > 0) {
               setServiceImage(service.images[0]);
             }
@@ -96,7 +100,7 @@ export default function AddNewService() {
     }
   }, [id, isEdit]);
 
-  const filteredSubCategories = allSubCategories.filter(sub => 
+  const filteredSubCategories = allSubCategories.filter(sub =>
     !category || sub.categoryId === parseInt(category)
   );
 
@@ -120,7 +124,7 @@ export default function AddNewService() {
     setLoading(true);
     try {
       const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-      const currentUserId = userData.id || 3; 
+      const currentUserId = userData.id || 3;
 
       // Flat payload structure based on the very first prompt's backend data
       const createFormData = (day, start, end) => {
@@ -130,9 +134,9 @@ export default function AddNewService() {
         formData.append('subcategoryId', parseInt(subCategory));
         formData.append('service_title_id', parseInt(serviceName));
         formData.append('price', parseFloat(price));
-        formData.append('max_price', parseFloat(price) + 50); 
-        formData.append('day_of_week', day === "Always" ? "Saturday" : day); 
-        formData.append('start_time', start); 
+        formData.append('max_price', parseFloat(price) + 50);
+        formData.append('day_of_week', day === "Always" ? "Saturday" : day);
+        formData.append('start_time', start);
         formData.append('end_time', end);
         formData.append('availability_status', "available");
 
@@ -142,13 +146,24 @@ export default function AddNewService() {
         formData.append('description', description || "");
         formData.append('commission_fee', parseFloat(commission) || 0);
         formData.append('state', state || "active");
+        
+        // If it was rejected, resetting status to pending for "Request Again"
+        if (isEdit && status?.toLowerCase() === 'rejected') {
+          formData.append('status', 'pending');
+        } else if (status) {
+          formData.append('status', status);
+        }
 
         if (serviceImageFile) {
           formData.append('images', serviceImageFile);
         } else if (serviceGallery.length > 0) {
           formData.append('images', serviceGallery[0]);
         }
-        
+
+        if (isEdit) {
+          formData.append('_method', 'PUT');
+        }
+
         return formData;
       };
 
@@ -188,19 +203,19 @@ export default function AddNewService() {
         toast.success(`Service added successfully!`);
       } catch (err) {
         if (err.response?.status === 401) {
-           toast.error("Session expired or unauthorized. Please try logging in again.");
+          toast.error("Session expired or unauthorized. Please try logging in again.");
         } else {
-           console.error(`Failed to add service:`, err.response?.data || err.message);
-           const errorMsg = err.response?.data?.message || 'Server error. Please check your data.';
-           toast.error(errorMsg);
+          console.error(`Failed to add service:`, err.response?.data || err.message);
+          const errorMsg = err.response?.data?.message || 'Server error. Please check your data.';
+          toast.error(errorMsg);
         }
         throw err;
       }
-      
+
       setTimeout(() => {
         navigate("/provider/serviceList");
       }, 1500);
-      
+
     } catch (error) {
       console.error("Error saving service:", error);
       if (error.response?.status !== 401) {
@@ -245,7 +260,7 @@ export default function AddNewService() {
     } else {
       updatedSlots.push({ day: selectedDay, slots: [newSlot] });
     }
-    
+
     updatedSlots.sort((a, b) => days.indexOf(a.day) - days.indexOf(b.day));
     setScheduleSlots(updatedSlots);
 
@@ -266,323 +281,365 @@ export default function AddNewService() {
   return (
 
     <>
-    <div className="bg-[#f8f9fa] min-h-screen p-4">
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="bg-white px-6 py-2 rounded-lg shadow-sm border border-gray-100">
-          <h1 className="text-lg font-bold text-sky-900">
-            {isEdit ? 'Edit Service' : 'Requests New Service'}
-          </h1>
-        </div>
-        {!isEdit && (
-          <div className="bg-yellow-100 text-yellow-700 px-6 py-1.5 rounded-lg shadow-sm border border-[#fef3c7]">
-            <span className="text-sm font-bold">PENDING</span>
+      <div className="bg-[#f8f9fa] min-h-screen p-4">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="bg-white px-6 py-2 rounded-lg shadow-sm border border-gray-100">
+            <h1 className="text-lg font-bold text-sky-900">
+              {isEdit ? 'Edit Service' : 'Add New Service'}
+            </h1>
           </div>
-        )}
-      </div>
-
-      <div className="bg-white rounded-[1.5rem] shadow-sm p-8 border border-gray-100">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 mb-8">
-          {/* Row 1 */}
-          <div>
-            <label className="block mb-2 text-xs font-bold text-gray-600">
-              Select Category <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={category}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-              className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm appearance-none transition-all"
-              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
-            >
-              <option value="">Select Category</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.category_name || cat.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block mb-2 text-xs font-bold text-gray-600">
-              Select Sub-Category <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={subCategory}
-              onChange={(e) => handleSubCategoryChange(e.target.value)}
-              className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm appearance-none transition-all"
-              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
-            >
-              <option value="">Select Sub-Category</option>
-              {filteredSubCategories.map(sub => (
-                <option key={sub.id} value={sub.id}>{sub.subcategory_name || sub.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block mb-2 text-xs font-bold text-gray-600">
-              Service <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={serviceName}
-              onChange={(e) => setServiceName(e.target.value)}
-              className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm appearance-none transition-all"
-              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
-            >
-              <option value="">Select Service</option>
-              {filteredServiceTitles.map(title => (
-                <option key={title.id} value={title.id}>{title.service_title || title.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block mb-2 text-xs font-bold text-gray-600">
-              Commission value
-            </label>
-            <input
-              type="text"
-              value={commission}
-              disabled={true}
-              className="block w-full px-4 py-2.5 bg-gray-100 border border-gray-200 text-gray-500 text-xs rounded-xl focus:ring-0 shadow-sm transition-all"
-              placeholder="0"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-xs font-bold text-gray-600">
-              Pricing Type <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={pricingType}
-              onChange={(e) => setPricingType(e.target.value)}
-              className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm appearance-none transition-all"
-              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
-            >
-              <option value="">Pricing Type</option>
-              <option value="Hourly">Hourly</option>
-              <option value="Fixed">Fixed</option>
-              <option value="Free">Free</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block mb-2 text-xs font-bold text-gray-600">
-              Price <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm transition-all"
-              placeholder="0"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-xs font-bold text-gray-600">
-              State <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={state}
-              onChange={(e) => setState(e.target.value)}
-              className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm appearance-none transition-all"
-              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
-            >
-              <option value="">State</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block mb-2 text-xs font-bold text-gray-600">
-              Service Image <span className="text-red-500">*</span>
-            </label>
-            <div className="relative flex items-center">
-              <div className="w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-400 text-xs rounded-xl shadow-sm truncate pr-28 transition-all">
-                {serviceImageFile ? serviceImageFile.name : ServiceImage}
-              </div>
-              <input
-                type="file"
-                id="image-upload"
-                className="hidden"
-                accept="image/*"
-                onChange={(e) => {
-                  if (e.target.files?.[0]) {
-                    setServiceImageFile(e.target.files[0]);
-                  }
-                }}
-              />
-              <label
-                htmlFor="image-upload"
-                className="absolute right-0 top-0 bottom-0 px-6 flex items-center bg-sky-900 text-white rounded-xl cursor-pointer hover:bg-sky-800 transition-all font-bold text-xs"
-              >
-                <i className="fa-solid fa-cloud-arrow-up mr-2 text-xs"></i>
-                Upload
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 mb-8">
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              className="sr-only peer"
-              checked={available}
-              onChange={() => setAvailable(!available)}
-            />
-            <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[6px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-700"></div>
-          </label>
-          <span className="text-xs font-bold text-gray-700">Always Available</span>
-          <span className="text-[10px] text-green-700 font-medium">(Sets schedule to 24/7 for all days)</span>
-        </div>
-
-        {!available && (
-          <div className="space-y-6">
-            <div className="flex flex-wrap gap-2">
-              {days.map((day) => {
-                const hasSlots = scheduleSlots.some(s => s.day === day);
-                const isSelected = selectedDay === day;
-                return (
-                  <button
-                    key={day}
-                    onClick={() => setSelectedDay(day)}
-                    className={`relative px-6 py-2 rounded-full text-xs font-bold transition-all border ${
-                      isSelected 
-                        ? 'bg-[#074665] text-white border-[#074665]' 
-                        : 'bg-white text-gray-500 border-gray-100 hover:border-gray-300'
-                    }`}
-                  >
-                    {day}
-                    {hasSlots && (
-                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-wrap items-end gap-6 shadow-sm">
-              <div className="flex gap-6">
-                <div>
-                  <label className="block text-[10px] text-gray-400 font-bold uppercase mb-1.5 ml-1">From</label>
-                  <input
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-gray-800 shadow-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 min-w-[120px] transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] text-gray-400 font-bold uppercase mb-1.5 ml-1">To</label>
-                  <input
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-gray-800 shadow-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 min-w-[120px] transition-all"
-                  />
-                </div>
-              </div>
+          <div className='flex gap-3'>
+            {status.toLowerCase() === 'rejected' && (
               <button
-                onClick={handleAddSchedule}
-                className="bg-sky-900 text-white px-8 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 hover:bg-sky-800 transition-all shadow-md active:scale-95"
+                onClick={() => setShowReasonModal(true)}
+                className="text-sm font-bold uppercase px-6 py-1-5 rounded-lg shadow-sm border hover:text-red-800 transition-colors bg-red-100 text-red-700 border-red-200"
               >
-                <i className="fa-solid fa-plus text-xs"></i>
-                Add Slot
+                Rejection Reason
               </button>
-            </div>
+            )}
+            {isEdit && status && (
+              <div className="flex items-center gap-2">
+                <div className={`px-6 py-1.5 rounded-lg shadow-sm border ${status.toLowerCase() === 'accepted' ? 'bg-green-100 text-green-700 border-green-200' :
+                  status.toLowerCase() === 'rejected' ? 'bg-red-100 text-red-700 border-red-200' :
+                    'bg-yellow-100 text-yellow-700 border-[#fef3c7]'
+                  }`}>
+                  <span className="text-sm font-bold uppercase">{status}</span>
+                </div>
 
-            {addedServices.length > 0 && (
-              <div className="mt-10">
-                <div className="flex items-center gap-2 mb-5">
-                   <div className="w-1 h-1 bg-sky-900 rounded-full"></div>
-                   <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Full Weekly Schedule</h3>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                  {addedServices.map((service, index) => (
-                    <div key={index} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-[10px] font-black text-sky-900 uppercase tracking-wider">{service.day}</span>
-                        <span className="bg-sky-900 text-white text-[9px] font-bold px-2.5 py-1 rounded-full">
-                          {service.slots.length} Slots
-                        </span>
-                      </div>
-                      <div className="space-y-2.5">
-                        {service.slots.map((slot, sIdx) => (
-                          <div key={sIdx} className="flex justify-between items-center bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
-                            <span className="text-[10px] font-bold text-gray-700">{slot.display}</span>
-                            <button className="text-gray-300 hover:text-red-500 transition-colors">
-                              <i className="fa-solid fa-circle-xmark text-xs"></i>
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+
               </div>
             )}
-          </div>
-        )}
-
-        <div className="mt-10 md:grid-cols-2 gap-8">
-          <div className='my-10'>
-            <label className="block mb-2 text-xs font-bold text-gray-600">
-              Service Gallery
-            </label>
-            <div className="relative flex items-center">
-              <div className="w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-400 text-xs rounded-xl shadow-sm truncate pr-28 transition-all">
-                {serviceGallery.length > 0 ? `${serviceGallery.length} images selected` : "Browser"}
-              </div>
-              <input
-                type="file"
-                id="gallery-upload"
-                multiple
-                className="hidden"
-                onChange={(e) => setServiceGallery([...e.target.files])}
-              />
-              <label
-                htmlFor="gallery-upload"
-                className="absolute right-0 top-0 bottom-0 px-6 flex items-center bg-sky-900 text-white rounded-xl cursor-pointer hover:bg-sky-800 transition-all font-bold text-xs"
-              >
-                <i className="fa-solid fa-images mr-2 text-xs"></i>
-                Upload
-              </label>
-            </div>
-          </div>
-          
-          <div className="md:row-span-2">
-            <label className="block mb-2 text-xs font-bold text-gray-600">
-              Description <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows="4"
-              className="block w-full px-5 py-4 bg-white border border-gray-200 text-gray-900 text-xs rounded-2xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm resize-none transition-all"
-              placeholder="Explain your service in detail..."
-            ></textarea>
           </div>
         </div>
 
-        <div className="flex justify-end mt-10">
-          <button
-            onClick={handleSave}
-            disabled={loading || !category || !subCategory || !serviceName || !pricingType || !price || !description}
-            className="bg-sky-900 text-white px-10 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-sky-800 transition-all disabled:opacity-50 shadow-lg shadow-sky-900/10 active:scale-95"
-          >
-            {loading ? (
-              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-            ) : (
-              <i className="fa-solid fa-floppy-disk text-sm"></i>
-            )}
-            <span className="text-sm">{loading ? 'Saving...' : 'Save Service'}</span>
-          </button>
+        <div className="bg-white rounded-[1.5rem] shadow-sm p-8 border border-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 mb-8">
+            {/* Row 1 */}
+            <div>
+              <label className="block mb-2 text-xs font-bold text-gray-600">
+                Select Category <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={category}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm appearance-none transition-all"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
+              >
+                <option value="">Select Category</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.category_name || cat.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 text-xs font-bold text-gray-600">
+                Select Sub-Category <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={subCategory}
+                onChange={(e) => handleSubCategoryChange(e.target.value)}
+                className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm appearance-none transition-all"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
+              >
+                <option value="">Select Sub-Category</option>
+                {filteredSubCategories.map(sub => (
+                  <option key={sub.id} value={sub.id}>{sub.subcategory_name || sub.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 text-xs font-bold text-gray-600">
+                Service <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={serviceName}
+                onChange={(e) => setServiceName(e.target.value)}
+                className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm appearance-none transition-all"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
+              >
+                <option value="">Select Service</option>
+                {filteredServiceTitles.map(title => (
+                  <option key={title.id} value={title.id}>{title.service_title || title.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 text-xs font-bold text-gray-600">
+                Commission value
+              </label>
+              <input
+                type="text"
+                value={commission}
+                disabled={true}
+                className="block w-full px-4 py-2.5 bg-gray-100 border border-gray-200 text-gray-500 text-xs rounded-xl focus:ring-0 shadow-sm transition-all"
+                placeholder="0"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-xs font-bold text-gray-600">
+                Pricing Type <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={pricingType}
+                onChange={(e) => setPricingType(e.target.value)}
+                className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm appearance-none transition-all"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
+              >
+                <option value="">Pricing Type</option>
+                <option value="Hourly">Hourly</option>
+                <option value="Fixed">Fixed</option>
+                <option value="Free">Free</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 text-xs font-bold text-gray-600">
+                Price <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm transition-all"
+                placeholder="0"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-xs font-bold text-gray-600">
+                State <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                className="block w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-900 text-xs rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm appearance-none transition-all"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
+              >
+                <option value="">State</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block mb-2 text-xs font-bold text-gray-600">
+                Service Image <span className="text-red-500">*</span>
+              </label>
+              <div className="relative flex items-center">
+                <div className="w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-400 text-xs rounded-xl shadow-sm truncate pr-28 transition-all">
+                  {serviceImageFile ? serviceImageFile.name : ServiceImage}
+                </div>
+                <input
+                  type="file"
+                  id="image-upload"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      setServiceImageFile(e.target.files[0]);
+                    }
+                  }}
+                />
+                <label
+                  htmlFor="image-upload"
+                  className="absolute right-0 top-0 bottom-0 px-6 flex items-center bg-sky-900 text-white rounded-xl cursor-pointer hover:bg-sky-800 transition-all font-bold text-xs"
+                >
+                  <i className="fa-solid fa-cloud-arrow-up mr-2 text-xs"></i>
+                  Upload
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 mb-8">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={available}
+                onChange={() => setAvailable(!available)}
+              />
+              <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[6px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-700"></div>
+            </label>
+            <span className="text-xs font-bold text-gray-700">Always Available</span>
+            <span className="text-[10px] text-green-700 font-medium">(Sets schedule to 24/7 for all days)</span>
+          </div>
+
+          {!available && (
+            <div className="space-y-6">
+              <div className="flex flex-wrap gap-2">
+                {days.map((day) => {
+                  const hasSlots = scheduleSlots.some(s => s.day === day);
+                  const isSelected = selectedDay === day;
+                  return (
+                    <button
+                      key={day}
+                      onClick={() => setSelectedDay(day)}
+                      className={`relative px-6 py-2 rounded-full text-xs font-bold transition-all border ${isSelected
+                        ? 'bg-[#074665] text-white border-[#074665]'
+                        : 'bg-white text-gray-500 border-gray-100 hover:border-gray-300'
+                        }`}
+                    >
+                      {day}
+                      {hasSlots && (
+                        <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-wrap items-end gap-6 shadow-sm">
+                <div className="flex gap-6">
+                  <div>
+                    <label className="block text-[10px] text-gray-400 font-bold uppercase mb-1.5 ml-1">From</label>
+                    <input
+                      type="time"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-gray-800 shadow-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 min-w-[120px] transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-gray-400 font-bold uppercase mb-1.5 ml-1">To</label>
+                    <input
+                      type="time"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                      className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-gray-800 shadow-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 min-w-[120px] transition-all"
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={handleAddSchedule}
+                  className="bg-sky-900 text-white px-8 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 hover:bg-sky-800 transition-all shadow-md active:scale-95"
+                >
+                  <i className="fa-solid fa-plus text-xs"></i>
+                  Add Slot
+                </button>
+              </div>
+
+              {addedServices.length > 0 && (
+                <div className="mt-10">
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="w-1 h-1 bg-sky-900 rounded-full"></div>
+                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Full Weekly Schedule</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                    {addedServices.map((service, index) => (
+                      <div key={index} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+                        <div className="flex justify-between items-center mb-4">
+                          <span className="text-[10px] font-black text-sky-900 uppercase tracking-wider">{service.day}</span>
+                          <span className="bg-sky-900 text-white text-[9px] font-bold px-2.5 py-1 rounded-full">
+                            {service.slots.length} Slots
+                          </span>
+                        </div>
+                        <div className="space-y-2.5">
+                          {service.slots.map((slot, sIdx) => (
+                            <div key={sIdx} className="flex justify-between items-center bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
+                              <span className="text-[10px] font-bold text-gray-700">{slot.display}</span>
+                              <button className="text-gray-300 hover:text-red-500 transition-colors">
+                                <i className="fa-solid fa-circle-xmark text-xs"></i>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="mt-10 md:grid-cols-2 gap-8">
+            <div className='my-10'>
+              <label className="block mb-2 text-xs font-bold text-gray-600">
+                Service Gallery
+              </label>
+              <div className="relative flex items-center">
+                <div className="w-full px-4 py-2.5 bg-white border border-gray-200 text-gray-400 text-xs rounded-xl shadow-sm truncate pr-28 transition-all">
+                  {serviceGallery.length > 0 ? `${serviceGallery.length} images selected` : "Browser"}
+                </div>
+                <input
+                  type="file"
+                  id="gallery-upload"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => setServiceGallery([...e.target.files])}
+                />
+                <label
+                  htmlFor="gallery-upload"
+                  className="absolute right-0 top-0 bottom-0 px-6 flex items-center bg-sky-900 text-white rounded-xl cursor-pointer hover:bg-sky-800 transition-all font-bold text-xs"
+                >
+                  <i className="fa-solid fa-images mr-2 text-xs"></i>
+                  Upload
+                </label>
+              </div>
+            </div>
+
+            <div className="md:row-span-2">
+              <label className="block mb-2 text-xs font-bold text-gray-600">
+                Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows="4"
+                className="block w-full px-5 py-4 bg-white border border-gray-200 text-gray-900 text-xs rounded-2xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-sm resize-none transition-all"
+                placeholder="Explain your service in detail..."
+              ></textarea>
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-10">
+            <button
+              onClick={handleSave}
+              disabled={loading || !category || !subCategory || !serviceName || !pricingType || !price || !description}
+              className="bg-sky-900 text-white px-10 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-sky-800 transition-all disabled:opacity-50 shadow-lg shadow-sky-900/10 active:scale-95"
+            >
+              {loading ? (
+                <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+              ) : (
+                <i className="fa-solid fa-floppy-disk text-sm"></i>
+              )}
+              <span className="text-sm">
+                {loading ? 'Saving...' : (isEdit && status.toLowerCase() === 'rejected' ? "Request Again" : 'Save Service')}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  </>
+
+      {/* Rejection Reason Modal */}
+      {showReasonModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowReasonModal(false)}></div>
+          <div className="bg-white rounded-[2rem] shadow-2xl max-w-md w-full relative z-[110] p-8 animate-in zoom-in duration-300">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i className="fa-solid fa-circle-exclamation text-3xl"></i>
+            </div>
+            <h3 className="text-xl font-black text-sky-900 mb-4 text-center">Rejection Reason</h3>
+            <div className="bg-gray-50 rounded-2xl p-6 mb-8 border border-gray-100">
+              <p className="text-gray-600 text-sm font-medium leading-relaxed italic text-center">
+                "{rejectionReason || "No specific reason provided."}"
+              </p>
+            </div>
+            <button
+              onClick={() => setShowReasonModal(false)}
+              className="w-full py-3 bg-sky-900 text-white font-bold rounded-xl hover:bg-sky-800 shadow-lg shadow-sky-900/10 transition-all uppercase tracking-widest text-xs"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

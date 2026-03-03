@@ -111,7 +111,7 @@ export default function Provider() {
           {/* Menu */}
           <ul className="flex-1 overflow-y-auto px-3 py-4 space-y-2 text-sm">
 
-            <li className="flex items-center justify-between px-3 py-2 rounded hover:bg-brand-primary  focus:bg-brand-primary/80">
+            <li className="flex items-center justify-between px-3 py-2 rounded hover:bg-[#64ccc5]/20  focus:bg-[#64ccc5]/50">
               <div className="flex items-center gap-2">
                 <FaList className="text-lg"/>
                 <span>Points</span>
@@ -121,7 +121,7 @@ export default function Provider() {
               </span>
             </li>
 
-            <SidebarLink to="/" icon={<IoHome className="text-lg"/>} text="Home" />
+            <SidebarLink to="/"icon={<IoHome className="text-lg"/>} text="Home" />
 
             <SidebarLink
               to="/provider/categoryManagement"
@@ -133,7 +133,7 @@ export default function Provider() {
             <li>
               <button
                 onClick={() => toggleMenu("service")}
-                className="flex items-center w-full px-3 py-2 rounded hover:bg-brand-primary  focus:bg-brand-primary/80"
+                className="flex items-center w-full px-3 py-2 rounded hover:bg-[#64ccc5]/20  focus:bg-[#64ccc5]/50"
               >
                 <GrServices className=" text-lg font-lg"/>
                 <span className="ms-3 flex-1 text-left">Service Management</span>
@@ -142,12 +142,12 @@ export default function Provider() {
               {openMenu === "service" && (
                 <ul className="ms-8 mt-1 space-y-1 text-sm">
                   <li>
-                    <Link to="/provider/serviceList" className="block hover:text-brand-secondary hover:bg-brand-primary focus:bg-sky-800/80">
+                    <Link to="/provider/serviceList" className="block hover:bg-[#64ccc5]/20 focus:bg-[#64ccc5]/50">
                       • Services List
                     </Link>
                   </li>
                   <li>
-                    <Link to="/provider/addService" className="block hover:text-brand-secondary hover:bg-brand-primary focus:bg-brand-primary/80">
+                    <Link to="/provider/addService" className="block hover:bg-[#64ccc5]/20 focus:bg-[#64ccc5]/50">
                       • Add Service
                     </Link>
                   </li>
@@ -249,7 +249,7 @@ function SidebarLink({ to, icon, text }) {
     <li>
       <Link
         to={to}
-        className="flex items-center px-3 py-2 rounded hover:bg-brand-primary  focus:bg-brand-primary/80"
+        className="flex items-center px-3 py-2 rounded hover:bg-[#64ccc5]/20  focus:bg-[#64ccc5]/50"
       >
         {icon}
         <span className="ms-3">{text}</span>
