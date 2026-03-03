@@ -31,15 +31,11 @@ import CashbackManagement from "./components/ProviderDashboard/CashbackManagemen
 import AddNewService from "./components/ProviderDashboard/AddNewService";
 import MainLayout from "./components/layout/MainLayout";
 import Booking from "./components/CustomerDashboard/Booking"
-import Category from "./components/CustomerDashboard/Category";
 import Points from "./components/CustomerDashboard/Points";
-import Service from "./components/CustomerDashboard/Service";
 import ProviderManagement from "./components/CustomerDashboard/ProviderManagement";
 import PayoutC from "./components/CustomerDashboard/Payout";
 import CustomerManagementC from "./components/CustomerDashboard/CustomerManagement";
-import System from "./components/CustomerDashboard/System";
 import Cashback from "./components/CustomerDashboard/Cashback";
-import Main from "./components/CustomerDashboard/Main";
 import Profile from './components/Profile'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { HashRouter } from "react-router-dom";
@@ -76,15 +72,12 @@ function App() {
                 <Customer />
               </ProtectedRoute>
             }>
-              <Route path="main" element={<Main />} />
+              /////////
               <Route path="booking" element={<Booking />} />
-              <Route path="category" element={<Category />} />
               <Route path="points" element={<Points />} />
-              <Route path="service" element={<Service />} />
               <Route path="provider" element={<ProviderManagement />} />
               <Route path="payout" element={<PayoutC />} />
               <Route path="customersm" element={<CustomerManagementC />} />
-              <Route path="system" element={<System />} />
               <Route path="cashback" element={<Cashback />} />
             </Route>
             <Route path="/login" element={<Login />} />
