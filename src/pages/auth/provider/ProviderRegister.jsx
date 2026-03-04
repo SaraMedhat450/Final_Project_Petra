@@ -196,7 +196,7 @@ const ProviderRegister = () => {
 
       // Check if it's an ngrok error
       if (text.includes('ngrok') || text.includes('ERR_NGROK')) {
-        toast.error("⚠️ Backend server appears to be offline.");
+        toast.error("Backend server appears to be offline.");
       } else {
         toast.error(`Registration failed with status ${response.status}`);
       }
@@ -217,7 +217,7 @@ const ProviderRegister = () => {
     }
 
     if (response.ok) {
-      toast.success("✅ Provider Registration successful!");
+      toast.success("Registration successful!");
       localStorage.removeItem('provider_reg_data');
     } else {
       // Show the specific error message from the backend
@@ -234,9 +234,9 @@ const ProviderRegister = () => {
         }
 
         const firstError = data.errors[0]?.msg || "Validation failed";
-        toast.error(`❌ Registration failed: ${firstError}`);
+        toast.error(`Registration failed: ${firstError}`);
       } else {
-        toast.error(`❌ Registration failed: ${data.message || "Unknown error"}`);
+        toast.error(`Registration failed: ${data.message || "Unknown error"}`);
       }
     }
   };

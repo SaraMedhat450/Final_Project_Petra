@@ -161,7 +161,11 @@ const StepInfo = ({ formData, setFormData, nextStep, backendErrors = {} }) => {
             className={`w-full px-5 py-3 border-2 ${errors.phone ? 'border-red-500' : 'border-gray-200'} rounded-xl bg-white/50 outline-none transition-all focus:ring-2 focus:ring-[#176B87]/10 focus:border-[#176B87] font-bold text-sm placeholder:text-[#176B87]/40`}
             autoComplete="tel"
             value={formData.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
+            maxLength={15}
+            onChange={(e) => {
+              const val = e.target.value.replace(/[^0-9+]/g, '');
+              handleChange('phone', val);
+            }}
           />
           {errors.phone && <p className="mt-1 text-xs text-red-500 font-medium">{errors.phone}</p>}
         </div>

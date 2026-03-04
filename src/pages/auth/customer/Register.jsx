@@ -199,7 +199,12 @@ const Register = () => {
                 type="text"
                 name="phone"
                 value={formData.phone}
-                onChange={handleChange}
+                maxLength={15}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9+]/g, '');
+                  setFormData({ ...formData, phone: val });
+                  if (errors.phone) setErrors({ ...errors, phone: "" });
+                }}
                 placeholder="Enter your phone number"
                 autoComplete="tel"
                 className={`w-full px-4 py-3 border-2 ${

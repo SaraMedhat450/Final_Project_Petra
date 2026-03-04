@@ -69,10 +69,47 @@ const Hero = ({ services, searchQuery, setSearchQuery }) => {
     }
   };
 
-  const getImageUrl = (image) => {
-    if (!image || image === '00' || image === 'undefined' || image === 'null') return slides[0].image;
-    if (image.startsWith('http')) return image;
-    return `${UPLOAD_URL}/${image.replace(/["'[\]\\]/g, '').trim()}`;
+  const getImageUrl = (img) => {
+    // 1. Initial cleanup and fallback check
+    if (!img || img === '00' || img === 'undefined' || img === 'null') return slides[0].image;
+    
+    // 2. Already a full URL?
+    if (typeof img === 'string' && img.startsWith('http')) return img;
+
+    // 3. Try to extract first image if it's a JSON string or array
+    let finalPath = img;
+    try {
+        let raw = img;
+        // Deeply parse in case of nested JSON strings
+        while (typeof raw === 'string' && (raw.startsWith('[') || raw.startsWith('{') || raw.startsWith('"'))) {
+            try {
+                const parsed = JSON.parse(raw);
+                raw = parsed;
+            } catch (e) { break; }
+        }
+        
+        if (Array.isArray(raw) && raw.length > 0) {
+            finalPath = raw[0];
+        } else if (typeof raw === 'string') {
+            finalPath = raw;
+        }
+    } catch (e) {
+        console.error("Hero Img Parse Error:", e);
+    }
+
+    // 4. Final path cleanup
+    if (!finalPath || typeof finalPath !== 'string' || finalPath === '00' || finalPath === 'undefined' || finalPath === 'null') {
+        return slides[0].image;
+    }
+
+    // 5. Clean up stray characters and build URL
+    const cleanPath = finalPath.replace(/["'[\]\\]/g, '').trim();
+    if (!cleanPath) return slides[0].image;
+
+    // If it's a full URL now after parsing
+    if (cleanPath.startsWith('http')) return cleanPath;
+
+    return `${UPLOAD_URL}/${cleanPath}`;
   };
 
   return (
@@ -90,19 +127,24 @@ const Hero = ({ services, searchQuery, setSearchQuery }) => {
         }}
         className="h-full w-full hero-swiper"
       >
-        {heroSlides.map((slide) => {
+        {heroSlides.map((slide, index) => {
           const slideImage = getImageUrl(slide.image);
           
           return (
-            <SwiperSlide key={slide.id}>
+            <SwiperSlide key={`${slide.id}-${index}`}>
                 <div className="relative w-full h-full flex items-center">
                 {/* Background Image */}
                 <div className="absolute inset-0">
                     <div className="absolute inset-0 bg-black/65 z-10" />
                     <img 
                         src={slideImage} 
-                        alt={slide.title} 
+                        alt={slide.title || 'Service'} 
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                            if (e.target.src !== slides[0].image) {
+                                e.target.src = slides[0].image;
+                            }
+                        }}
                     />
                 </div>
                 

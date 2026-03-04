@@ -109,9 +109,10 @@ const SubCategories = () => {
                                 <Link 
                                     key={sub.id}
                                     to={`/services?category=${encodeURIComponent(sub.name)}&subcategoryId=${sub.id}`}
-                                    className="group relative h-[400px] rounded-[2.5rem] flex flex-col cursor-pointer transition-all duration-500 bg-[#F0F9F9] hover:shadow-2xl hover:-translate-y-2 overflow-hidden border border-gray-100"
+                                    className="group relative h-[480px] rounded-[3.5rem] flex flex-col cursor-pointer transition-all duration-500 bg-white hover:shadow-2xl hover:-translate-y-3 overflow-hidden border border-gray-100 shadow-sm"
                                 >
-                                    <div className="relative w-full h-[250px] overflow-hidden bg-[#E0F2F2] flex items-center justify-center">
+                                    {/* Jumbo Image Section */}
+                                    <div className="relative w-full h-[240px] overflow-hidden bg-[#F0F9F9] flex items-center justify-center">
                                         {imageUrl ? (
                                             <img 
                                                 src={imageUrl} 
@@ -119,21 +120,28 @@ const SubCategories = () => {
                                                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex flex-col items-center justify-center bg-[#E0F2F2] text-[#176B87] gap-3">
-                                                <LayoutGrid size={48} strokeWidth={1.5} />
-                                                <span className="text-[10px] font-black uppercase tracking-widest">No Image</span>
+                                            <div className="w-full h-full flex flex-col items-center justify-center text-[#176B87]">
+                                                <LayoutGrid size={48} strokeWidth={1} />
                                             </div>
                                         )}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#04364A]/20 to-transparent"></div>
+                                        
+                        
                                     </div>
                                     
-                                    <div className="flex-1 flex flex-col p-6 items-center text-center justify-center">
-                                        <h3 className="text-xl font-black tracking-tight mb-2 text-[#04364A] group-hover:text-[#176B87] transition-colors line-clamp-2">
+                                    {/* Detailed Content Area */}
+                                    <div className="flex-1 flex flex-col p-8 items-center text-center bg-[#F0F9F9]">
+                                        <h3 className="text-2xl font-black tracking-tighter mb-3 text-[#04364A] group-hover:text-[#176B87] transition-all line-clamp-1 hover:scale-105 transform origin-center">
                                             {sub.name}
                                         </h3>
-                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#64CCC5] opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                                            Explore Services
-                                        </p>
+                                        
+                                        {/* Dynamic Description */}
+                                        <div className="mb-6 h-[60px] flex items-center justify-center px-2">
+                                            <p className="text-gray-400 text-xs font-medium leading-relaxed line-clamp-2">
+                                                {sub.description || `Discover high-quality ${sub.name.toLowerCase()} services and top-rated professionals.`}
+                                            </p>
+                                        </div>
+
+                                       
                                     </div>
                                 </Link>
                             );

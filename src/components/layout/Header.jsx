@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { User, LogOut, Menu, X, Search, Bell, ChevronDown, AlertCircle } from 'lucide-react';
+import { User, LogOut, Menu, X, Search, Bell, ChevronDown, LogOut as LogoutIcon, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { logout } from '@/store/slices/authSlice';
 import { API_ENDPOINTS, UPLOAD_URL } from '@/config/api';
-import { logout as logoutAction } from '@/store/slices/authSlice';
 
 const UserAvatar = ({ user }) => {
     let src = null;
@@ -41,15 +41,14 @@ const Header = () => {
     const { isAuthenticated, user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const getDashboardPath = () => {
         if (!isAuthenticated || !user) return '/login';
         // Check role from user object or localStorage as fallback
         const role = user.role || localStorage.getItem('userRole');
-
-        if (role === 'provider') return '/provider/serviceList';
+        if (role === 'provider') return '/provider/main';
         if (role === 'customer') return '/customer/booking';
-
         return '/profile';
     };
 
@@ -62,9 +61,8 @@ const Header = () => {
     ];
 
     const handleLogout = () => {
-        dispatch(logoutAction());
-        toast.success("Logged out successfully");
-        setShowLogoutModal(false);
+        dispatch(logout());
+        toast.success('Logged out successfully');
         navigate('/login');
     };
 
@@ -86,13 +84,19 @@ const Header = () => {
                     {/* Middle: Nav Links (Moved from right to middle as per design) */}
                     <nav className="hidden lg:flex items-center gap-10">
                         {navLinks.map((link) => (
-                            <Link
+                            <NavLink
                                 key={link.name}
-                                to={link.path}
-                                className="text-[11px] font-black uppercase tracking-[0.2em] text-[#04364A] hover:text-[#64CCC5] transition-colors"
+                                  to={link.path}
+                                className={({ isActive }) =>
+                                    `text-[11px] font-black uppercase tracking-[0.2em] transition-all relative py-1
+                                    ${isActive 
+                                        ? 'text-[#64CCC5]' 
+                                        : 'text-[#04364A] hover:text-[#64CCC5]'
+                                    }`
+                                }
                             >
                                 {link.name}
-                            </Link>
+                            </NavLink>
                         ))}
                     </nav>
 
@@ -115,8 +119,12 @@ const Header = () => {
                                         <p className="text-[10px] font-black uppercase tracking-widest text-[#04364A]">{user?.name?.split(' ')[0]}</p>
                                     </div>
                                 </Link>
-                                <button onClick={() => setShowLogoutModal(true)} className="text-[#04364A]/60 hover:text-red-500 transition-colors">
-                                    <LogOut size={18} />
+                                <button 
+                                    onClick={() => setShowLogoutModal(true)} 
+                                    className="group/logout flex items-center gap-2 px-4 py-2 rounded-xl text-[#04364A] bg-[#04364A]/5 hover:bg-[#04364A] hover:text-white transition-all duration-300 border border-[#04364A]/5 hover:border-[#04364A] shadow-sm hover:shadow-lg shadow-[#04364A]/5"
+                                >
+                                    <LogOut size={16} className="group-hover/logout:translate-x-0.5 transition-transform" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest hidden xl:block ">Logout</span>
                                 </button>
                             </div>
                         ) : (
@@ -175,15 +183,22 @@ const Header = () => {
                 <div className="fixed inset-0 top-[73px] bg-white z-[60] p-8 flex flex-col gap-8 animate-in slide-in-from-right duration-500">
                     <div className="flex flex-col gap-2">
                         {navLinks.map((link) => (
-                            <Link
+                            <NavLink
                                 key={link.name}
                                 to={link.path}
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="text-xl font-black text-[#04364A] py-5 border-b border-gray-100 flex justify-between items-center"
+                                className={({ isActive }) =>
+                                    `text-xl font-black py-5 border-b border-gray-100 flex justify-between items-center transition-all
+                                    ${isActive ? 'text-[#64CCC5]' : 'text-[#04364A]'}`
+                                }
                             >
-                                {link.name}
-                                <span className="text-gray-200">→</span>
-                            </Link>
+                                {({ isActive }) => (
+                                    <>
+                                        {link.name}
+                                        <span className={isActive ? 'text-[#64CCC5]' : 'text-gray-200'}>→</span>
+                                    </>
+                                )}
+                            </NavLink>
                         ))}
                     </div>
 
@@ -203,7 +218,7 @@ const Header = () => {
                     </div>
                 </div>
             )}
-            {/* Logout Confirmation Modal */}
+             {/* Logout Confirmation Modal */}
             {showLogoutModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowLogoutModal(false)}></div>
@@ -232,6 +247,7 @@ const Header = () => {
                     </div>
                 </div>
             )}
+          
         </header>
     );
 };

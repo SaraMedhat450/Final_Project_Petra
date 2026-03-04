@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ArrowRight } from 'lucide-react';
+import { toast } from 'sonner';
 import { API_ENDPOINTS, COMMON_HEADERS } from '../../config/api';
 
 // --- Home Components ---
@@ -129,6 +130,18 @@ const Home = () => {
       }
     };
     loadData();
+    
+  }, []);
+
+  // Welcome Toast - Every visit for now to confirm it's visible
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      toast("Welcome to Platform!", {
+        description: "Find the best services for your needs.",
+        position: 'bottom-right',
+      });
+    }, 500);
+    return () => clearTimeout(timer);
   }, []);
 
   // 4. Handle Multi-select Toggle
