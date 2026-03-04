@@ -1,16 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { IoHome } from "react-icons/io5";
-import { FaCoins, FaList, FaMoneyBillWave } from "react-icons/fa6";
-import { FaUsersCog } from "react-icons/fa";
-import { BiCategoryAlt } from "react-icons/bi";
 import { GrServices } from "react-icons/gr";
-import { MdOutlineEventAvailable, MdManageAccounts, MdAdminPanelSettings } from "react-icons/md";
-import { GiTakeMyMoney } from "react-icons/gi";
+import { MdOutlineEventAvailable, MdManageAccounts, MdOutlineHome, MdOutlineSpaceDashboard, MdOutlineCalendarMonth } from "react-icons/md";
 import { HiMenuAlt2, HiX } from "react-icons/hi";
 import { serviceService } from "../services";
 import toast from 'react-hot-toast';
 import { AlertCircle } from "lucide-react";
+import { BsAward } from "react-icons/bs";
 
 export default function Provider() {
   const [openMenu, setOpenMenu] = useState(null);
@@ -113,7 +109,7 @@ export default function Provider() {
 
             <li className="flex items-center justify-between px-3 py-2 rounded hover:bg-[#64ccc5]/20  focus:bg-[#64ccc5]/50">
               <div className="flex items-center gap-2">
-                <FaList className="text-lg"/>
+                <BsAward className="w-5 h-5 flex-shrink-0" />
                 <span>Points</span>
               </div>
               <span className="bg-red-500 px-2 py-0.5 rounded-full text-xs">
@@ -121,12 +117,18 @@ export default function Provider() {
               </span>
             </li>
 
-            <SidebarLink to="/"icon={<IoHome className="text-lg"/>} text="Home" />
+            <SidebarLink to="/"icon={<MdOutlineHome className="w-5 h-5 flex-shrink-0" />} text="Home" />
 
             <SidebarLink
-              to="/provider/categoryManagement"
-              icon={<BiCategoryAlt className="text-lg font-lg"/>}
-              text="Category Management"
+              to="/provider/dashboard"
+              icon={<MdOutlineSpaceDashboard className="w-5 h-5 flex-shrink-0" />}
+              text="Dashboard"
+            />
+
+            <SidebarLink
+              to="/provider/providerCalender"
+              icon={<MdOutlineCalendarMonth className="w-5 h-5 flex-shrink-0" />}
+              text="Provider Calender"
             />
 
             {/* Service Management */}
@@ -143,53 +145,51 @@ export default function Provider() {
                 <ul className="ms-8 mt-1 space-y-1 text-sm">
                   <li>
                     <Link to="/provider/serviceList" className="block hover:bg-[#64ccc5]/20 focus:bg-[#64ccc5]/50">
-                      • Services List
+                      • My Services
                     </Link>
                   </li>
                   <li>
                     <Link to="/provider/addService" className="block hover:bg-[#64ccc5]/20 focus:bg-[#64ccc5]/50">
-                      • Add Service
+                      • Service Requests
                     </Link>
                   </li>
                 </ul>
               )}
             </li>
 
-            <SidebarLink
-              to="/provider/bookingManagement"
-              icon={<MdOutlineEventAvailable className="text-lg font-lg"/>}
-              text="Booking Management"
-            />
+            {/* Booking Management */}
+            <li>
+              <button
+                onClick={() => toggleMenu("booking")}
+                className="flex items-center w-full px-3 py-2 rounded hover:bg-[#64ccc5]/20  focus:bg-[#64ccc5]/50"
+              >
+                <MdOutlineEventAvailable className="text-lg font-lg"/>
+                <span className="ms-3 flex-1 text-left">Booking Management</span>
+              </button>
+
+              {openMenu === "booking" && (
+                <ul className="ms-8 mt-1 space-y-1 text-sm">
+                  <li>
+                    <Link to="/provider/bookingList" className="block hover:bg-[#64ccc5]/20 focus:bg-[#64ccc5]/50">
+                      • Booking List
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/provider/payout" className="block hover:bg-[#64ccc5]/20 focus:bg-[#64ccc5]/50">
+                      • Payments List
+                    </Link>
+                  </li>
+                </ul>
+              )}
+            </li>
+
 
             <SidebarLink
-              to="/provider/providersManagement"
-              icon={<FaUsersCog className="text-lg font-lg"/>}
-              text="Providers Management"
-            />
-
-            <SidebarLink
-              to="/provider/payout"
-              icon={<FaMoneyBillWave className="text-lg font-lg"/>}
-              text="Payout"
-            />
-
-            <SidebarLink
-              to="/provider/customerManagement"
+              to="/provider/profileAndSettings"
               icon={<MdManageAccounts className="text-lg font-lg"/>}
-              text="Customer Management"
+              text="Profile & Settings"
             />
 
-            <SidebarLink
-              to="/provider/systemUsers"
-              icon={<MdAdminPanelSettings className="text-lg font-lg"/>}
-              text="System Users"
-            />
-
-            <SidebarLink
-              to="/provider/cashbackManagement"
-              icon={<FaCoins className="text-lg font-lg"/>}
-              text="Points & Cashback"
-            />
           </ul>
 
           {/* Logout */}

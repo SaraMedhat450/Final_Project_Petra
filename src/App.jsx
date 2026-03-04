@@ -21,13 +21,10 @@ import Provider from "./pages/Provider";
 import ProviderMain from "./components/ProviderDashboard/ProviderMain";
 import ProviderServiceList from "./components/ProviderDashboard/ProviderServiceList";
 import ProviderPoints from "./components/ProviderDashboard/ProviderPoints";
-import ProviderCategoryManagement from "./components/ProviderDashboard/ProviderCategoryManagement";
-import ProviderBookingManagement from "./components/ProviderDashboard/ProviderBookingManagement";
-import ProvidersManagement from "./components/ProviderDashboard/ProvidersManagement";
+import Dashboard from "./components/ProviderDashboard/Dashboard";
+import BookingList from "./components/ProviderDashboard/BookingList";
 import Payout from "./components/ProviderDashboard/Payout";
-import CustomerManagement from "./components/CustomerDashboard/CustomerManagement";
-import SystemUsers from "./components/ProviderDashboard/CashbackManagement";
-import CashbackManagement from "./components/ProviderDashboard/CashbackManagement";
+import ProfileAndSettings from "./components/ProviderDashboard/ProfileAndSettings";
 import AddNewService from "./components/ProviderDashboard/AddNewService";
 import MainLayout from "./components/layout/MainLayout";
 import Booking from "./components/CustomerDashboard/Booking"
@@ -39,6 +36,7 @@ import Cashback from "./components/CustomerDashboard/Cashback";
 import Profile from './components/Profile'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { HashRouter } from "react-router-dom";
+import ProviderCalender from './components/ProviderDashboard/ProviderCalender'
 
 function App() {
   return (
@@ -92,13 +90,11 @@ function App() {
             <Route path="points" element={<ProviderPoints />} />
             <Route path="main" element={<ProviderMain />} />
             <Route path="serviceList" element={<ProviderServiceList />} />
-            <Route path="providersManagement" element={<ProvidersManagement />} />
-            <Route path="categoryManagement" element={<ProviderCategoryManagement />} />
-            <Route path="bookingManagement" element={<ProviderBookingManagement />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="providerCalender" element={<ProviderCalender />} />
+            <Route path="bookingList" element={<BookingList />} />
             <Route path="payout" element={<Payout />} />
-            <Route path="customerManagement" element={<CustomerManagement />} />
-            <Route path="systemUsers" element={<SystemUsers />} />
-            <Route path="cashbackManagement" element={<CashbackManagement />} />
+            <Route path="profileAndSettings" element={<ProfileAndSettings />} />
             <Route path="addService" element={<AddNewService />} />
             <Route path="editService/:id" element={<AddNewService />} />
           </Route>

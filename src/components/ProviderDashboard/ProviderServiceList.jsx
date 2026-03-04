@@ -159,13 +159,13 @@ export default function ProviderServiceList() {
     <div className="p-6 bg-[#f8f9fa] min-h-screen">
       {/* Header Card */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 mb-6 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-sky-900">Services Management</h1>
+        <h1 className="text-xl font-bold text-sky-900">My Services</h1>
         <Link
           to="/provider/addService"
           className="bg-sky-900 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-sky-900/90 transition-colors"
         >
           <i className="fa-solid fa-plus"></i>
-          Add New Service
+          Request New Service
         </Link>
       </div>
 

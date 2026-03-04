@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
     const location = useLocation();
 
     const segments = location.pathname.split('/');
-    const dashboardSubPaths = ["main", "points", "serviceList", "categoryManagement", "bookingManagement", "payout", "customerManagement", "systemUsers", "cashbackManagement", "providersManagement", "addService", "editService", "signup"];
+    const dashboardSubPaths = ["main", "points", "serviceList", "providerCalender", "dashboard", "bookingList", "payout", "profileAndSettings", "addService", "editService", "signup"];
 
     const hideLayout = 
     location.pathname.startsWith("/profile") ||
