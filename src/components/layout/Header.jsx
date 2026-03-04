@@ -47,7 +47,7 @@ const Header = () => {
         if (!isAuthenticated || !user) return '/login';
         // Check role from user object or localStorage as fallback
         const role = user.role || localStorage.getItem('userRole');
-        if (role === 'provider') return '/provider/main';
+        if (role === 'provider') return '/provider/serviceList';
         if (role === 'customer') return '/customer/booking';
         return '/profile';
     };
