@@ -379,7 +379,7 @@ const StepServices = ({ formData, setFormData, submitForm, loading, backendError
 
   const handleSkip = () => {
     // Submit the form without requiring services or schedule
-    submitForm();
+    submitForm(true);
   };
 
   return (

@@ -22,7 +22,7 @@ const ServiceSidebar = ({
                 <div className="space-y-10">
                     {/* Category List */}
                     <div className="space-y-4">
-                        <p className="text-xs font-black text-[#04364A] uppercase tracking-widest leading-none ml-1">Domain</p>
+                        <p className="text-xs font-black text-[#04364A] uppercase tracking-widest leading-none ml-1">All categories</p>
                         <div className="relative">
                             <div className="space-y-1.5 max-h-[240px] overflow-y-auto pr-2 custom-sidebar-scroll">
                                 <button 

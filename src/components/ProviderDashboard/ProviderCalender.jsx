@@ -8,7 +8,7 @@ export default function ProviderCalender() {
     <div className="p-6 min-h-full flex flex-col">
       {/* Header */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 mb-6 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-sky-900">Customer Calendar</h1>
+        <h1 className="text-xl font-bold text-sky-900">Provider Calendar</h1>
         <span className="text-sm text-gray-500">Your upcoming appointments</span>
       </div>
 
