@@ -4,9 +4,10 @@ import StepInfo from '@/components/auth/StepInfo'
 import StepServices from '@/components/auth/StepServices'
 import toast from 'react-hot-toast';
 import { API_ENDPOINTS, COMMON_HEADERS } from '@/config/api';
+import { Link, useNavigate } from 'react-router-dom'
 
-import { Link } from 'react-router-dom'
 const ProviderRegister = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
 
   // Initialize from localStorage if available
@@ -59,7 +60,7 @@ const ProviderRegister = () => {
     localStorage.setItem('provider_reg_data', JSON.stringify(serializableData));
   }, [formData]);
 
-  const submitForm = async () => {
+  const submitForm = async (isSkipping = false) => {
     setLoading(true);
     setBackendErrors({});
 
@@ -79,26 +80,30 @@ const ProviderRegister = () => {
           image: formData.serviceImg
         };
 
-      // Determine availability fields based on toggle
-      let day_of_week = "Monday";
-      let start_time = "09:00";
-      let end_time = "17:00";
-      let availabilityStatus = "always available";
+      let day_of_week = null;
+      let start_time = null;
+      let end_time = null;
+      let availabilityStatus = null;
 
-      if (formData.isAlwaysAvailable) {
-        day_of_week = "All Days";
-      } else {
-        availabilityStatus = "available";
-        const scheduledDays = Object.keys(formData.availability || {}).filter(
-          day => formData.availability[day]?.length > 0
-        );
+      if (!isSkipping) {
+        if (formData.isAlwaysAvailable) {
+          day_of_week = "All Days";
+          availabilityStatus = "always available";
+          start_time = "09:00";
+          end_time = "17:00";
+        } else {
+          availabilityStatus = "available";
+          const scheduledDays = Object.keys(formData.availability || {}).filter(
+            day => formData.availability[day]?.length > 0
+          );
 
-        if (scheduledDays.length > 0) {
-          const firstDay = scheduledDays[0];
-          const firstSlot = formData.availability[firstDay][0];
-          day_of_week = firstDay;
-          start_time = firstSlot.from;
-          end_time = firstSlot.to;
+          if (scheduledDays.length > 0) {
+            const firstDay = scheduledDays[0];
+            const firstSlot = formData.availability[firstDay][0];
+            day_of_week = firstDay;
+            start_time = firstSlot.from;
+            end_time = firstSlot.to;
+          }
         }
       }
 
@@ -129,46 +134,61 @@ const ProviderRegister = () => {
       }
 
       // --- Service fields ---
-      const finalPrice = String(serviceData.price || formData.price || 0);
-      const finalMaxPrice = String(serviceData.max_price || formData.max_price || finalPrice);
+      if (!isSkipping) {
+        if (serviceData.categoryId || formData.categoryId) {
+          fd.append('categoryId', String(serviceData.categoryId || formData.categoryId));
+        }
+        if (serviceData.subcategoryId || formData.subcategoryId) {
+          fd.append('subcategoryId', String(serviceData.subcategoryId || formData.subcategoryId));
+        }
+        if (serviceData.service_title_id || formData.service_title_id) {
+          fd.append('service_title_id', String(serviceData.service_title_id || formData.service_title_id));
+        }
 
-      fd.append('categoryId', String(serviceData.categoryId || formData.categoryId || 1));
-      fd.append('subcategoryId', String(serviceData.subcategoryId || formData.subcategoryId || 1));
-      fd.append('service_title_id', String(serviceData.service_title_id || formData.service_title_id || 1));
-      fd.append('price_Type', serviceData.price_Type || formData.price_Type || 'Hourly');
-      fd.append('price', finalPrice);
-      fd.append('max_price', finalMaxPrice);
-      fd.append('description', serviceData.description || formData.description || '');
+        const pType = serviceData.price_Type || formData.price_Type;
+        if (pType) fd.append('price_Type', pType);
+
+        const finalPrice = serviceData.price || formData.price;
+        if (finalPrice) fd.append('price', String(finalPrice));
+
+        const finalMaxPrice = serviceData.max_price || formData.max_price || finalPrice;
+        if (finalMaxPrice) fd.append('max_price', String(finalMaxPrice));
+
+        if (serviceData.description || formData.description) {
+          fd.append('description', serviceData.description || formData.description);
+        }
+
+        // --- Service image ---
+        if (serviceData.image && (serviceData.image instanceof File || serviceData.image instanceof Blob)) {
+          console.log("✅ Appending service image file:", serviceData.image.name);
+          fd.append('images', serviceData.image);
+        } else {
+          console.log("ℹ️ No service image file found, sending JSON image name:", serviceImageName);
+          fd.append('images', JSON.stringify([serviceImageName]));
+        }
+      }
       fd.append('commission_fee', formData.companyConission || '10%');
 
-      // --- Service image ---
-      if (serviceData.image && (serviceData.image instanceof File || serviceData.image instanceof Blob)) {
-        console.log("✅ Appending service image file:", serviceData.image.name);
-        fd.append('images', serviceData.image);
-      } else {
-        console.log("ℹ️ No service image file found, sending JSON image name:", serviceImageName);
-        // Images list as JSON string if there's no actual file
-        fd.append('images', JSON.stringify([serviceImageName]));
-      }
+      if (!isSkipping) {
+        if (availabilityStatus) fd.append('availabilityStatus', availabilityStatus);
+        if (day_of_week) fd.append('day_of_week', day_of_week);
+        if (start_time) fd.append('start_time', start_time);
+        if (end_time) fd.append('end_time', end_time);
 
-      // --- Availability ---
-      fd.append('day_of_week', day_of_week);
-      fd.append('start_time', start_time);
-      fd.append('end_time', end_time);
-      fd.append('availabilityStatus', availabilityStatus);
-
-      // Build full availability array
-      const availabilities = [];
-      if (formData.isAlwaysAvailable) {
-        availabilities.push({ day_of_week: 'All Days', start_time: '09:00', end_time: '17:00' });
-      } else {
-        Object.keys(formData.availability || {}).forEach(day => {
-          (formData.availability[day] || []).forEach(slot => {
-            availabilities.push({ day_of_week: day, start_time: slot.from, end_time: slot.to });
+        const availabilities = [];
+        if (formData.isAlwaysAvailable) {
+          availabilities.push({ day_of_week: 'All Days', start_time: '09:00', end_time: '17:00' });
+        } else {
+          Object.keys(formData.availability || {}).forEach(day => {
+            (formData.availability[day] || []).forEach(slot => {
+              availabilities.push({ day_of_week: day, start_time: slot.from, end_time: slot.to });
+            });
           });
-        });
+        }
+        if (availabilities.length > 0) {
+          fd.append('availabilities', JSON.stringify(availabilities));
+        }
       }
-      fd.append('availabilities', JSON.stringify(availabilities));
 
       console.log("📤 Submitting Provider Registration (FormData):");
 
@@ -219,6 +239,7 @@ const ProviderRegister = () => {
     if (response.ok) {
       toast.success("Registration successful!");
       localStorage.removeItem('provider_reg_data');
+      navigate("/login");
     } else {
       // Show the specific error message from the backend
       if (data.errors) {
