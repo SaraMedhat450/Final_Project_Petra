@@ -34,6 +34,7 @@ import PayoutC from "./components/CustomerDashboard/Payout";
 import CustomerManagementC from "./components/CustomerDashboard/CustomerManagement";
 import Cashback from "./components/CustomerDashboard/Cashback";
 import Profile from './components/Profile'
+import Contact from './pages/contact/Contact'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { HashRouter } from "react-router-dom";
 import ProviderCalender from './components/ProviderDashboard/ProviderCalender'
@@ -45,6 +46,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/subcategories" element={<SubCategories />} />
           <Route path="/services" element={<Services />} />

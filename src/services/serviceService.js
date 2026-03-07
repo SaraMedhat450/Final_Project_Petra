@@ -39,11 +39,18 @@ const serviceService = {
                 return null;
             }
 
-            const response = await api.get(`/provider/${providerId}`);
-            return response.data;
+            // Try /providers/active/:id first (public-ish), fallback to /provider/:id
+            try {
+                const r = await api.get(`/providers/active/${providerId}`);
+                const d = r.data;
+                return d.provider || d.data || (d.id ? d : null);
+            } catch {
+                const response = await api.get(`/provider/${providerId}`);
+                return response.data;
+            }
         } catch (error) {
             console.error('Error fetching provider data:', error);
-            throw error;
+            return null; // Don't throw — dashboard should still render
         }
     },
 
@@ -59,11 +66,50 @@ const serviceService = {
 
     updateService: async (id, serviceData) => {
         try {
-            // Using POST with _method: PUT is more reliable for FormData/File uploads
             const response = await api.post(`/service/${id}`, serviceData);
             return response.data;
         } catch (error) {
             console.error('Error updating service:', error.response?.data || error.message);
+            throw error;
+        }
+    },
+
+    /**
+     * Fetch bookings for the current authenticated user.
+     * Returns a normalized array (handles all common response shapes).
+     */
+    getBookings: async () => {
+        try {
+            const response = await api.get('/booking');
+            const d = response.data;
+            // Handles: array, {data: []}, {bookings: []}, {booking: []}
+            if (Array.isArray(d)) return d;
+            if (Array.isArray(d?.data)) return d.data;
+            if (Array.isArray(d?.bookings)) return d.bookings;
+            if (Array.isArray(d?.booking)) return d.booking;
+            return [];
+        } catch (error) {
+            console.error('Error fetching bookings:', error);
+            return []; // Return empty array so dashboards don't crash
+        }
+    },
+
+    createBooking: async (bookingData) => {
+        try {
+            const response = await api.post('/booking', bookingData);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating booking:', error);
+            throw error;
+        }
+    },
+
+    updateBookingStatus: async (id, status) => {
+        try {
+            const response = await api.put(`/booking/${id}/status`, { status });
+            return response.data;
+        } catch (error) {
+            console.error('Error updating booking status:', error);
             throw error;
         }
     }

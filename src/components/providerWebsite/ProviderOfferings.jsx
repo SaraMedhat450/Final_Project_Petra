@@ -50,7 +50,7 @@ const ProviderOfferings = ({ services, getImageSrc }) => {
                                             {srv.max_price && srv.max_price > srv.price && (
                                                 <span className="text-sm text-gray-400 font-bold ml-1">- ${srv.max_price}</span>
                                             )}
-                                            <span className="text-xs text-gray-400 font-bold">.00</span>
+                                            <span className="text-xs text-gray-400 font-bold ml-1">/{srv.price_Type?.toLowerCase().includes('hour') ? 'hr' : (srv.price_Type?.toLowerCase().includes('fix') ? 'total' : srv.price_Type?.toLowerCase() || 'hr')}</span>
                                         </p>
                                     </div>
                                     <Link 

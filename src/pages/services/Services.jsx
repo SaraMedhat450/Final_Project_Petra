@@ -24,7 +24,7 @@ const Services = () => {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedSubcategory, setSelectedSubcategory] = useState('All');
     const [selectedArea, setSelectedArea] = useState('All');
-    const [priceRange, setPriceRange] = useState([0, 100000]); 
+    const [priceRange, setPriceRange] = useState([0, 10000]); 
     const [sortBy, setSortBy] = useState('Newest');
     const [viewMode, setViewMode] = useState('grid');
     const [showFilters, setShowFilters] = useState(false);
@@ -300,7 +300,7 @@ const Services = () => {
     };
 
     return (
-        <div className="bg-gray-50/50 min-h-screen pt-24 pb-20">
+        <div className="bg-gray-50/50 min-h-screen pb-20">
             <ServiceHeader servicesCount={services.length} />
             
             <ServiceSearchBar 

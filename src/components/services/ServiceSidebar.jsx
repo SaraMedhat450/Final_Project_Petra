@@ -69,23 +69,23 @@ const ServiceSidebar = ({
                     </div>
 
                     {/* Price Range */}
-                    <div className="space-y-6">
+                    <div className="space-y-3 pt-4 border-t border-gray-50">
                         <div className="flex justify-between items-end">
-                            <p className="text-xs font-black text-[#04364A] uppercase tracking-widest leading-none">Price Range</p>
-                            <span className="text-[10px] font-bold text-[#64CCC5]">${priceRange[0]} - ${priceRange[1]}</span>
+                            <p className="text-[10px] font-black text-[#04364A] uppercase tracking-widest leading-none">Price Range</p>
+                            <span className="text-[9px] font-bold text-[#64CCC5]">${priceRange[0]} - ${priceRange[1]}</span>
                         </div>
                         <input 
                             type="range" 
                             min="0" 
-                            max="100000" 
-                            step="100"
+                            max="10000" 
+                            step="50"
                             value={priceRange[1]}
                             onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                            className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#64CCC5]"
+                            className="w-full h-1 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#64CCC5]"
                         />
-                        <div className="flex justify-between text-[8px] font-black text-gray-300 uppercase tracking-widest">
+                        <div className="flex justify-between text-[7px] font-black text-gray-300 uppercase tracking-widest">
                             <span>$0</span>
-                            <span>$100k+</span>
+                            <span>$10k+</span>
                         </div>
                     </div>
                 </div>

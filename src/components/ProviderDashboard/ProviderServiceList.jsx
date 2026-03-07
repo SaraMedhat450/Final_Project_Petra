@@ -232,7 +232,10 @@ export default function ProviderServiceList() {
                 {currentEntries.map((service, index) => (
                   <tr key={service.id} className="hover:bg-gray-50 transition-colors ">
                     <td className="px-2 py-3 text-center">
-                      {service.Service_title.name}
+                      {(() => {
+                        const title = serviceTitles.find(t => t.id === service.service_title_id);
+                        return title ? (title.service_title || title.name) : service.service_title_id;
+                      })()}
                     </td>
                     <td className="px-2 py-3 text-center">
                       {(() => {

@@ -34,7 +34,17 @@ const HomeCategories = ({ categories, loading, selectedCategories, onSelectCateg
     <div id="categories" className="py-24 bg-white relative">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between mb-16 px-4">
-           <h2 className="text-4xl font-black text-[#04364A] tracking-tight">Categories</h2>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 text-[#64CCC5] animate-fade-in">
+              <div className="w-12 h-[22px] rounded-full bg-[#64CCC5]/10 flex items-center justify-center">
+                <LayoutGrid size={12} strokeWidth={3} />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Browse Directory</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-black text-[#04364A] tracking-tighter leading-none">
+              Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#176B87] to-[#04364A]">Categories.</span>
+            </h2>
+          </div>
            
            <div className="flex items-center gap-4">
              <div className="hidden md:flex gap-2">
@@ -102,7 +112,15 @@ const HomeCategories = ({ categories, loading, selectedCategories, onSelectCateg
                                   src={imageUrl} 
                                   alt={cat.name} 
                                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                                  onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center bg-[#E0F2F2] text-[#176B87] gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-grid"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg><span class="text-[10px] font-black uppercase tracking-widest">No Image</span></div>'; }}
+                                  onError={(e) => { 
+                                      if (e.target) e.target.style.display = 'none'; 
+                                      if (e.target && e.target.parentElement) {
+                                          const placeholder = document.createElement('div');
+                                          placeholder.className = "w-full h-full flex flex-col items-center justify-center bg-[#E0F2F2] text-[#176B87] gap-3";
+                                          placeholder.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-grid"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg><span class="text-[10px] font-black uppercase tracking-widest">No Image</span>';
+                                          e.target.parentElement.appendChild(placeholder);
+                                      }
+                                  }}
                               />
                           ) : (
                               <div className={`w-full h-full flex flex-col items-center justify-center ${isActive ? 'bg-white/5 text-[#64CCC5]' : `${cardStyles.placeholder} ${cardStyles.text}`} gap-3`}>

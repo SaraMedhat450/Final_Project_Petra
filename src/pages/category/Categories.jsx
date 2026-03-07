@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Grid, List } from 'lucide-react';
+import { Search, Grid, List, ChevronRight,ChevronLeft } from 'lucide-react';
 import { API_ENDPOINTS, COMMON_HEADERS } from '@/config/api';
 import CategoryCard from '@/components/category/CategoryCard';
 import { Link } from 'react-router-dom';
+import categoriesBg from '@/assets/categories_bg.png';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
@@ -10,6 +11,8 @@ const Categories = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [viewMode, setViewMode] = useState('grid');
     const [sortBy, setSortBy] = useState('Default');
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 12;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -64,46 +67,64 @@ const Categories = () => {
         return a.id - b.id; // Default ID sort
     });
 
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredCategories.length / ITEMS_PER_PAGE);
+    const paginatedCategories = filteredCategories.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, sortBy]);
+
     return (
-        <div className="bg-gray-50/50 min-h-screen pt-24 pb-20">
+        <div className="bg-gray-50/50 min-h-screen pb-20">
              {/* Header Section */}
-             <div className="bg-[#04364A] py-20 px-6 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-[#64CCC5] rounded-full blur-[100px]"></div>
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#176B87] rounded-full blur-[100px]"></div>
+             <div className="bg-[#04364A] py-32 px-6 relative overflow-hidden">
+                <div className="absolute inset-0 z-0">
+                    <img src={categoriesBg} alt="background" className="w-full h-full object-cover opacity-15" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#04364A] via-transparent to-[#04364A]"></div>
+                    <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-[#64CCC5]/10 rounded-full blur-[120px] animate-pulse"></div>
+                    <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#176B87]/20 rounded-full blur-[120px] animate-pulse delay-700"></div>
+                    <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-[#64CCC5]/5 rounded-full blur-3xl animate-float"></div>
                 </div>
                 
                 <div className="max-w-7xl mx-auto relative z-10 text-center">
-                    <div className="inline-flex items-center gap-2 text-[#64CCC5] mb-4">
-                        <div className="w-10 h-[2px] bg-[#64CCC5]"></div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">Directory</span>
-                        <div className="w-10 h-[2px] bg-[#64CCC5]"></div>
-                    </div>
-                    
-                    <h1 className="text-5xl md:text-7xl font-display font-black text-white tracking-tight mb-8">
-                        Explore <span className="text-[#64CCC5]">Categories</span>
-                    </h1>
-                    
-                    <p className="text-[#DAFFFB]/60 text-lg max-w-2xl mx-auto font-medium leading-relaxed mb-8">
-                        Find the perfect professional for your needs across our specialized service categories.
-                    </p>
-
-                    {/* Stats Summary */}
-                    {!loading && categories.length > 0 && (
-                        <div className="flex items-center justify-center gap-8 mt-8">
-                            <div className="text-center">
-                                <div className="text-3xl font-black text-white">{categories.length}</div>
-                                <div className="text-[10px] font-bold uppercase tracking-widest text-[#64CCC5]">Categories</div>
-                            </div>
-                            <div className="w-[1px] h-8 bg-white/10"></div>
-                            <div className="text-center">
-                                <div className="text-3xl font-black text-white">
-                                    {categories.reduce((acc, cat) => acc + (cat.subcategories?.length || 0), 0)}
-                                </div>
-                                <div className="text-[10px] font-bold uppercase tracking-widest text-[#64CCC5]">Subcategories</div>
-                            </div>
+                    <div className="flex flex-col items-center space-y-8">
+                        <div className="inline-flex items-center gap-3 text-[#64CCC5] animate-fade-in">
+                            <div className="w-10 h-[2px] bg-[#64CCC5]"></div>
+                            <span className="text-[11px] font-black uppercase tracking-[0.4em]">Expert Directory</span>
+                            <div className="w-10 h-[2px] bg-[#64CCC5]"></div>
                         </div>
-                    )}
+                        
+                        <div className="space-y-4">
+                            <h1 className="text-6xl md:text-8xl font-display font-black text-white tracking-tighter leading-none animate-fade-in delay-100">
+                                Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#64CCC5] to-[#DAFFFB]">Categories.</span>
+                            </h1>
+                            
+                            <p className="text-[#DAFFFB]/60 text-xl max-w-2xl mx-auto font-medium leading-relaxed animate-fade-in delay-200">
+                                Find the perfect professional for your needs across our specialized service ecosystem.
+                            </p>
+                        </div>
+
+                        {/* Stats Summary */}
+                        {!loading && categories.length > 0 && (
+                            <div className="flex items-center justify-center gap-12 mt-4 animate-fade-in delay-300">
+                                <div className="text-center group">
+                                    <div className="text-4xl font-black text-white group-hover:text-[#64CCC5] transition-colors">{categories.length}</div>
+                                    <div className="text-[9px] font-bold uppercase tracking-widest text-[#64CCC5] mt-1 opacity-60">Categories</div>
+                                </div>
+                                <div className="w-[1px] h-10 bg-white/10"></div>
+                                <div className="text-center group">
+                                    <div className="text-4xl font-black text-white group-hover:text-[#64CCC5] transition-colors">
+                                        {categories.reduce((acc, cat) => acc + (cat.subcategories?.length || 0), 0)}
+                                    </div>
+                                    <div className="text-[9px] font-bold uppercase tracking-widest text-[#64CCC5] mt-1 opacity-60">Specials</div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -141,12 +162,71 @@ const Categories = () => {
                             <div key={i} className="h-[460px] bg-white animate-pulse rounded-[2.5rem] border border-gray-100"></div>
                         ))}
                     </div>
-                ) : filteredCategories.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredCategories.map(cat => (
-                            <CategoryCard key={cat.id} category={cat} />
-                        ))}
-                    </div>
+                ) : paginatedCategories.length > 0 ? (
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {paginatedCategories.map(cat => (
+                                <CategoryCard key={cat.id} category={cat} />
+                            ))}
+                        </div>
+
+                        {/* Pagination UI */}
+                        {totalPages > 1 && (
+                            <div className="mt-20 flex flex-col items-center space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <button 
+                                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                        disabled={currentPage === 1}
+                                        className="w-14 h-14 rounded-2xl border-2 border-gray-100 flex items-center justify-center text-[#04364A] hover:border-[#64CCC5] hover:text-[#64CCC5] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                    >
+                                        <ChevronLeft size={24} />
+                                    </button>
+
+                                    <div className="flex items-center gap-2">
+                                        {[...Array(totalPages)].map((_, i) => {
+                                            const page = i + 1;
+                                            if (
+                                                page === 1 || 
+                                                page === totalPages || 
+                                                (page >= currentPage - 1 && page <= currentPage + 1)
+                                            ) {
+                                                return (
+                                                    <button 
+                                                        key={page}
+                                                        onClick={() => setCurrentPage(page)}
+                                                        className={`w-12 h-12 rounded-2xl font-black text-sm transition-all ${
+                                                            currentPage === page 
+                                                            ? 'bg-[#04364A] text-white shadow-xl scale-110' 
+                                                            : 'bg-white border-2 border-gray-100 text-[#04364A] hover:border-[#64CCC5]'
+                                                        }`}
+                                                    >
+                                                        {page}
+                                                    </button>
+                                                );
+                                            } else if (
+                                                page === currentPage - 2 || 
+                                                page === currentPage + 2
+                                            ) {
+                                                return <span key={page} className="text-gray-300">...</span>;
+                                            }
+                                            return null;
+                                        })}
+                                    </div>
+
+                                    <button 
+                                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                        disabled={currentPage === totalPages}
+                                        className="w-14 h-14 rounded-2xl border-2 border-gray-100 flex items-center justify-center text-[#04364A] hover:border-[#64CCC5] hover:text-[#64CCC5] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                    >
+                                        <ChevronRight size={24} />
+                                    </button>
+                                </div>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                    Page {currentPage} of {totalPages}
+                                </p>
+                            </div>
+                        )}
+                    </>
                 ) : (
                     <div className="text-center py-20">
                         <p className="text-gray-400 font-medium">No categories found matching your search.</p>

@@ -1,19 +1,49 @@
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TbCategoryFilled } from "react-icons/tb";
+import { serviceService } from "../../services";
+import toast from "react-hot-toast";
+
 export default function Booking() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const bookings = [
-    { id: 1, service: "Cleaning", bookingDate: "10/2/2026 - 10:00", serviceDate: "12/2/2026 - 12:00", provider: "Ahmed", payment: "Cash", amount: "$200", status: "Pending" },
-    { id: 2, service: "Plumbing", bookingDate: "11/2/2026 - 09:00", serviceDate: "13/2/2026 - 11:00", provider: "Mohamed", payment: "Visa", amount: "$350", status: "Done" },
-    { id: 3, service: "Electricity", bookingDate: "12/2/2026 - 02:00", serviceDate: "14/2/2026 - 04:00", provider: "Ali", payment: "Cash", amount: "$150", status: "Canceled" },
-    { id: 4, service: "Electricity", bookingDate: "12/2/2026 - 02:00", serviceDate: "14/2/2026 - 04:00", provider: "Ali", payment: "Cash", amount: "$150", status: "Canceled" },
-    { id: 5, service: "Electricity", bookingDate: "12/2/2026 - 02:00", serviceDate: "14/2/2026 - 04:00", provider: "Ali", payment: "Cash", amount: "$150", status: "Canceled" },
-    { id: 6, service: "Plumbing", bookingDate: "11/2/2026 - 09:00", serviceDate: "13/2/2026 - 11:00", provider: "Mohamed", payment: "Visa", amount: "$350", status: "Done" },
-  ];
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const bookingsArr = await serviceService.getBookings();
+        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+        const myId = Number(userData.id);
+
+        // Match booking against customer using any common field variant
+        const myBookings = bookingsArr.filter(b => {
+          const cid = Number(b.customer_id ?? b.customerId ?? b.Customer?.id ?? b.customer?.id ?? -1);
+          return cid === myId;
+        });
+        setBookings(myBookings);
+      } catch (err) {
+        toast.error("Failed to load bookings");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBookings();
+  }, []);
+
+  const handleCancel = async (id) => {
+    try {
+      await serviceService.updateBookingStatus(id, "Canceled");
+      setBookings(prev => prev.map(b => b.id === id ? { ...b, status: "Canceled" } : b));
+      toast.success("Booking canceled");
+      setOpenMenuId(null);
+    } catch (err) {
+      toast.error("Failed to cancel booking");
+    }
+  };
 
   const filteredBookings =
     statusFilter === "All"
@@ -60,24 +90,25 @@ export default function Booking() {
         </thead>
 
         <tbody>
-          {filteredBookings.map((item) => (
-
+          {loading ? (
+             <tr><td colSpan="9" className="text-center py-10">Loading your bookings...</td></tr>
+          ) : filteredBookings.map((item) => (
             <tr key={item.id} className="border border-x-0 border-gray-300 relative font-sm">
               <td className="px-6 py-3">{item.id}</td>
-              <td className="px-6 py-3">{item.service}</td>
-              <td className="px-6 py-3">{item.bookingDate}</td>
-              <td className="px-6 py-3">{item.serviceDate}</td>
-              <td className="px-6 py-3">{item.provider}</td>
-              <td className="px-6 py-3">{item.payment}</td>
-              <td className="px-6 py-3">{item.amount}</td>
+              <td className="px-6 py-3">{item.Service?.Service_title?.name || "Service"}</td>
+              <td className="px-6 py-3">{item.booking_date ? new Date(item.booking_date).toLocaleString() : 'N/A'}</td>
+              <td className="px-6 py-3">{item.service_date ? new Date(item.service_date).toLocaleString() : 'N/A'}</td>
+              <td className="px-6 py-3">{item.Provider?.User?.name || item.Provider?.name || "Provider"}</td>
+              <td className="px-6 py-3">Cash</td>
+              <td className="px-6 py-3">{item.total_price || item.price || 0} LE</td>
 
 
               <td className="px-6 py-3">
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium uppercase
-                    ${item.status === "Pending" && "bg-yellow-100 text-yellow-700"}
-                    ${item.status === "Done" && "bg-green-100 text-green-700"}
-                    ${item.status === "Canceled" && "bg-red-100 text-red-700"}
+                  className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest
+                    ${item.status === "Pending" && "bg-yellow-50 text-yellow-600"}
+                    ${item.status === "Done" && "bg-green-50 text-green-600"}
+                    ${item.status === "Canceled" && "bg-red-50 text-red-600"}
                   `}
                 >
                   {item.status}
@@ -89,32 +120,34 @@ export default function Booking() {
                   onClick={() =>
                     setOpenMenuId(openMenuId === item.id ? null : item.id)
                   }
-                  className="text-gray-700 hover:text-sky-900/70 flex justify-center w-full"
+                  className="text-gray-400 hover:text-sky-900 transition-colors flex justify-center w-full"
                 >
-                  <TbCategoryFilled size={28} />
+                  <TbCategoryFilled size={24} />
                 </button>
 
                 {openMenuId === item.id && (
-                  <div className="absolute top-full mt-1 w-28 bg-white text-black rounded-md shadow-lg z-10 left-1/2 -translate-x-1/2">
-                    <button className="block w-full text-center px-3 py-2 hover:bg-gray-200">
+                  <div className="absolute top-full mt-1 w-28 bg-white text-black rounded-xl shadow-2xl z-50 left-1/2 -translate-x-1/2 border border-gray-100 overflow-hidden py-1">
+                    <button className="block w-full text-center px-4 py-2 text-xs font-bold hover:bg-gray-50 transition-colors">
                       View
                     </button>
-                    <button
-                      onClick={() => setOpenMenuId(null)}
-                      className="block w-full text-center px-3 py-2 hover:bg-gray-200"
-                    >
-                      Cancel
-                    </button>
+                    {item.status === 'Pending' && (
+                      <button
+                        onClick={() => handleCancel(item.id)}
+                        className="block w-full text-center px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    )}
                   </div>
                 )}
               </td>
             </tr>
           ))}
 
-          {filteredBookings.length === 0 && (
+          {!loading && filteredBookings.length === 0 && (
             <tr>
-              <td colSpan="9" className="text-center py-6">
-                No data found
+              <td colSpan="9" className="text-center py-10 text-gray-400 italic">
+                No bookings found
               </td>
             </tr>
           )}

@@ -38,18 +38,7 @@ export default function Sidebar() {
           </div>
         </Link>
 
-        <Link
-          to="/customer/points"
-          className="flex items-center justify-between px-4 py-2 rounded-md hover:bg-[#64ccc5]"
-        >
-          <div className="flex items-center gap-3">
-            <FaList className="text-2xl" />
-            <span className="text-base font-medium">Points</span>
-          </div>
-          <span className="bg-red-500 text-white text-sm px-2 py-0.5 rounded-full font-medium">
-            545 LE
-          </span>
-        </Link>
+
 
         <div>
           <button
@@ -115,15 +104,7 @@ export default function Sidebar() {
           </div>
         </Link>
 
-        <Link
-          to="/customer/cashback"
-          className="flex items-center justify-between px-4 py-2 rounded-md hover:bg-[#64ccc5]"
-        >
-          <div className="flex items-center gap-3">
-            <FaCoins className="text-2xl" />
-            <span className="text-xl font-medium">Points & Cashback Management</span>
-          </div>
-        </Link>
+
       </div>
 
       <Link

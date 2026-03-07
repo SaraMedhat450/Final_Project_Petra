@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, Instagram, Twitter, Facebook, ArrowUpRight } from 'lucide-react';
+import ServioLogo from './ServioLogo';
 
 const Footer = () => {
     return (
@@ -9,13 +10,8 @@ const Footer = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-16">
                     {/* Brand Section */}
                     <div className="space-y-6 max-w-sm">
-                        <Link to="/" className="flex items-center gap-2 group">
-                            <div className="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center transition-transform group-hover:rotate-6 border border-white/5">
-                                <span className="text-[#64CCC5] font-black text-xl">P</span>
-                            </div>
-                            <span className="text-2xl font-black tracking-tighter text-white">
-                                PLAT<span className="text-[#64CCC5]">FORM</span>
-                            </span>
+                        <Link to="/">
+                            <ServioLogo light={true} />
                         </Link>
                         <p className="text-gray-400 text-sm font-medium leading-relaxed">
                             A network connecting you with verified local experts for any task. 
@@ -39,7 +35,7 @@ const Footer = () => {
                             <ul className="space-y-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
                                 <li className="hover:text-white cursor-pointer transition-colors">Support</li>
                                 <li className="hover:text-white cursor-pointer transition-colors">Live Chat</li>
-                                <li className="hover:text-white cursor-pointer transition-colors">Contact Us</li>
+                                <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
                             </ul>
                         </div>
                         <div className="space-y-4 hidden sm:block">
@@ -56,7 +52,7 @@ const Footer = () => {
                 {/* Bottom Bar */}
                 <div className="pt-8 border-t border-[#64CCC5]/10 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-                        © 2026 Platform
+                        © 2026 Servio
                     </p>
                     <div className="flex gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
                         <Link to="/privacy" className="hover:text-[#64CCC5] transition-colors">Privacy</Link>

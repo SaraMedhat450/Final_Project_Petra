@@ -44,7 +44,15 @@ const ServiceCard = ({ service, providers, auth, viewMode = 'grid' }) => {
                 src={imageUrl} 
                 alt={service.name} 
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center bg-gray-100/50 text-gray-300"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></div>'; }}
+                onError={(e) => { 
+                    if (e.target) e.target.style.display = 'none'; 
+                    if (e.target && e.target.parentElement) {
+                        const placeholder = document.createElement('div');
+                        placeholder.className = "w-full h-full flex flex-col items-center justify-center bg-gray-100/50 text-gray-300";
+                        placeholder.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>';
+                        e.target.parentElement.appendChild(placeholder);
+                    }
+                }}
             />
             ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100/50 text-gray-300">
@@ -115,7 +123,15 @@ const ServiceCard = ({ service, providers, auth, viewMode = 'grid' }) => {
             src={imageUrl} 
             alt={service.name} 
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center bg-gray-100/50 text-gray-300"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg><span class="text-[9px] font-black uppercase tracking-widest mt-1">No Image</span></div>'; }}
+                onError={(e) => { 
+                    if (e.target) e.target.style.display = 'none'; 
+                    if (e.target && e.target.parentElement) {
+                        const placeholder = document.createElement('div');
+                        placeholder.className = "w-full h-full flex flex-col items-center justify-center bg-gray-100/50 text-gray-300";
+                        placeholder.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg><span class="text-[9px] font-black uppercase tracking-widest mt-1">No Image</span>';
+                        e.target.parentElement.appendChild(placeholder);
+                    }
+                }}
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100/50 text-gray-300">

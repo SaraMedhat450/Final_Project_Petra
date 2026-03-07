@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Search, ArrowLeft, LayoutGrid, Star } from 'lucide-react';
+import { Search, ArrowLeft, LayoutGrid, Star, Sparkles } from 'lucide-react';
 import { API_ENDPOINTS, COMMON_HEADERS, UPLOAD_URL } from '@/config/api';
+import subcategoriesBg from '@/assets/subcategories_bg.png';
 
 const SubCategories = () => {
     const location = useLocation();
@@ -51,30 +52,42 @@ const SubCategories = () => {
     };
 
     return (
-        <div className="bg-gray-50/50 min-h-screen pt-24 pb-20">
+        <div className="bg-gray-50/50 min-h-screen pb-20">
             {/* Header Section */}
-            <div className="bg-[#04364A] py-20 px-6 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-[#64CCC5] rounded-full blur-[100px]"></div>
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#176B87] rounded-full blur-[100px]"></div>
+            <div className="bg-[#04364A] py-32 px-6 relative overflow-hidden">
+                <div className="absolute inset-0 z-0">
+                    <img src={subcategoriesBg} alt="background" className="w-full h-full object-cover opacity-20" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#04364A] via-transparent to-[#04364A]/80"></div>
+                    <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-[#64CCC5]/10 rounded-full blur-[120px] animate-pulse"></div>
+                    <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#176B87]/20 rounded-full blur-[120px] animate-pulse delay-700"></div>
                 </div>
                 
                 <div className="max-w-7xl mx-auto relative z-10 text-center">
                     <Link 
                         to="/categories" 
-                        className="inline-flex items-center gap-2 text-[#64CCC5] mb-8 hover:text-white transition-colors group"
+                        className="inline-flex items-center gap-3 text-[#64CCC5] mb-12 hover:text-white transition-all group animate-fade-in"
                     >
                         <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Back to Categories</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em]">Back to Categories</span>
                     </Link>
                     
-                    <h1 className="text-5xl md:text-7xl font-display font-black text-white tracking-tight mb-8">
-                        {categoryName || 'Sub'} <span className="text-[#64CCC5]">Categories</span>
-                    </h1>
-                    
-                    <p className="text-[#DAFFFB]/60 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-                        Explore specialized services within {categoryName || 'our categories'}.
-                    </p>
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-center gap-3 text-[#64CCC5] animate-fade-in delay-100">
+                            <div className="w-10 h-[2px] bg-[#64CCC5]"></div>
+                            <span className="text-[11px] font-black uppercase tracking-[0.4em] flex items-center gap-2">
+                                <Sparkles size={14} /> {categoryName || 'Market'} Specialized
+                            </span>
+                            <div className="w-10 h-[2px] bg-[#64CCC5]"></div>
+                        </div>
+
+                        <h1 className="text-6xl md:text-8xl font-display font-black text-white tracking-tighter leading-none animate-fade-in delay-200">
+                            {categoryName || 'Sub'} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#64CCC5] to-[#DAFFFB]">Categories.</span>
+                        </h1>
+                        
+                        <p className="text-[#DAFFFB]/60 text-xl max-w-2xl mx-auto font-medium leading-relaxed animate-fade-in delay-300">
+                            Explore specialized services tailored within {categoryName || 'our universe'}. 
+                        </p>
+                    </div>
                 </div>
             </div>
 

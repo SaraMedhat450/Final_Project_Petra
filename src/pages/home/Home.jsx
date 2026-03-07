@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { ArrowRight } from 'lucide-react';
-import { toast } from 'sonner';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { API_ENDPOINTS, COMMON_HEADERS } from '../../config/api';
 
 // --- Home Components ---
@@ -133,11 +133,11 @@ const Home = () => {
     
   }, []);
 
-  // Welcome Toast - Every visit for now to confirm it's visible
+  // Welcome Toast
   useEffect(() => {
     const timer = setTimeout(() => {
-      toast("Welcome to Platform!", {
-        description: "Find the best services for your needs.",
+      toast.success("Welcome to Servio!", {
+        duration: 3000,
         position: 'bottom-right',
       });
     }, 500);
@@ -163,24 +163,25 @@ const Home = () => {
   };
 
   // 5. Filter Logic
-  const filteredServices = services.filter(s => {
-    const sName = String(s?.name || s?.description || "");
-    const matchesSearch = sName.toLowerCase().includes((searchQuery || "").toLowerCase());
-    
-    // Match if 'All' is selected or if the service category is in our selected list
-    const matchesCategory = selectedCategories.includes('All') || 
-                            selectedCategories.includes(s.category) || 
-                            selectedCategories.includes(s.categoryName);
-                            
-    return matchesSearch && matchesCategory;
-  });
+  const filteredServices = React.useMemo(() => {
+    return services.filter(s => {
+      if (!s) return false;
+      const sName = String(s.name || s.description || "");
+      const matchesSearch = sName.toLowerCase().includes((searchQuery || "").toLowerCase());
+      
+      const matchesCategory = selectedCategories.includes('All') || 
+                              selectedCategories.includes(s.category);
+                              
+      return matchesSearch && matchesCategory;
+    });
+  }, [services, searchQuery, selectedCategories]);
 
   return (
     <div className="bg-gray-50/50 min-h-screen font-sans selection:bg-[#64CCC5] selection:text-white relative overflow-hidden">
       {/* Dynamic Background Blobs */}
-      <div className="absolute top-[10%] -left-20 w-[500px] h-[500px] bg-[#64CCC5]/5 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute top-[40%] -right-20 w-[600px] h-[600px] bg-[#176B87]/5 rounded-full blur-[150px] pointer-events-none"></div>
-      <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#04364A]/5 rounded-full blur-[180px] pointer-events-none"></div>
+      <div className="absolute top-[5%] -left-64 w-[800px] h-[800px] bg-[#64CCC5]/10 rounded-full blur-[160px] pointer-events-none animate-pulse"></div>
+      <div className="absolute top-[35%] -right-64 w-[1000px] h-[1000px] bg-[#176B87]/5 rounded-full blur-[200px] pointer-events-none animate-pulse"></div>
+      <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] bg-[#04364A]/5 rounded-full blur-[220px] pointer-events-none"></div>
 
       {/* Hero Section - The Grand Entrance */}
       <Hero 
@@ -207,9 +208,17 @@ const Home = () => {
         <section className="py-24 bg-gray-50/80">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex items-center justify-between mb-16 px-2">
-                    <h3 className="text-4xl font-black text-[#04364A] tracking-tight">
-                      Explore <span className="text-[#176B87]">Services</span>
-                    </h3>
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3 text-[#64CCC5] animate-fade-in">
+                            <div className="w-12 h-[22px] rounded-full bg-[#64CCC5]/10 flex items-center justify-center">
+                                <Sparkles size={12} strokeWidth={3} />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em]">Recommended for you</span>
+                        </div>
+                        <h3 className="text-5xl md:text-6xl font-black text-[#04364A] tracking-tighter leading-none">
+                            Discover <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#176B87] to-[#04364A]">Services.</span>
+                        </h3>
+                    </div>
                     
                     <Link 
                         to="/services"

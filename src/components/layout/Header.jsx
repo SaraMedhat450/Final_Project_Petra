@@ -5,6 +5,7 @@ import { User, LogOut, Menu, X, Search, Bell, ChevronDown, LogOut as LogoutIcon,
 import toast from 'react-hot-toast';
 import { logout } from '@/store/slices/authSlice';
 import { API_ENDPOINTS, UPLOAD_URL } from '@/config/api';
+import ServioLogo from './ServioLogo';
 
 const UserAvatar = ({ user }) => {
     let src = null;
@@ -72,13 +73,8 @@ const Header = () => {
                 <div className="flex justify-between items-center gap-8">
 
                     {/* Brand */}
-                    <Link to="/" className="flex items-center gap-2 group shrink-0">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#04364A]">
-                            <span className="text-[#64CCC5] font-black text-xl">P</span>
-                        </div>
-                        <span className="text-xl font-black tracking-tighter text-[#04364A]">
-                            PLAT<span className="text-[#64CCC5]">FORM</span>
-                        </span>
+                    <Link to="/">
+                        <ServioLogo />
                     </Link>
 
                     {/* Middle: Nav Links (Moved from right to middle as per design) */}

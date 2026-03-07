@@ -2,7 +2,7 @@ import React from 'react';
 import { Star, User } from 'lucide-react';
 import { UPLOAD_URL } from '@/config/api';
 
-const ProviderProfileCard = ({ provider, servicesCount }) => {
+const ProviderProfileCard = ({ provider, servicesCount, minPrice }) => {
     const getImageUrl = (image) => {
         if (!image || image === '00' || image === 'profile.jpg') return null;
         if (image.startsWith('http')) return image;
@@ -45,10 +45,12 @@ const ProviderProfileCard = ({ provider, servicesCount }) => {
                 </div>
 
                 <div className="pt-6 border-t border-gray-100 flex justify-between gap-4">
-                    <div className="text-center flex-1">
-                        <p className="text-xl font-black text-[#04364A]">{provider.points || '0'}</p>
-                        <p className="text-[8px] font-black uppercase tracking-widest text-gray-400">Total Points</p>
-                    </div>
+                    {minPrice !== null && (
+                        <div className="text-center flex-1">
+                            <p className="text-xl font-black text-[#04364A]">${minPrice}</p>
+                            <p className="text-[8px] font-black uppercase tracking-widest text-[#64CCC5]">Starting from</p>
+                        </div>
+                    )}
                     <div className="w-px bg-gray-100"></div>
                     <div className="text-center flex-1">
                         <p className="text-xl font-black text-[#04364A]">{servicesCount}</p>

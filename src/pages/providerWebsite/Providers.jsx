@@ -7,6 +7,7 @@ import {
 import { API_ENDPOINTS, COMMON_HEADERS, UPLOAD_URL } from '@/config/api';
 import ProviderCard from '@/components/providerWebsite/ProviderCard';
 import { Link } from 'react-router-dom';
+import providersBg from '@/assets/providers_bg.png';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -37,29 +38,62 @@ const Providers = () => {
                 const sData = sRes.ok ? await sRes.json() : [];
                 const cData = cRes.ok ? await cRes.json() : [];
 
-                const providerList = pData.providers || pData || [];
-                const allServices = Array.isArray(sData.services) ? sData.services : (Array.isArray(sData) ? sData : []);
+                // API confirmed: { providers: [...], Count: N }
+                const providerList = pData.providers || pData.data || (Array.isArray(pData) ? pData : []);
+                const allServices  = Array.isArray(sData.services) ? sData.services : (Array.isArray(sData) ? sData : []);
                 const allCategories = Array.isArray(cData) ? cData : [];
 
                 const categories = allCategories.filter(cat => cat.status === 'active');
-                const services = allServices.filter(s => s.status === 'active');
+                // Include both status and state checks since API uses both
+                const services   = allServices.filter(s => s.status === 'active' || s.state === 'active');
 
                 const categoryMap = categories.reduce((acc, cat) => {
-                    acc[cat.id] = cat.name;
+                    // API uses 'category_name', not 'name'
+                    acc[cat.id] = cat.category_name || cat.name || '';
                     return acc;
                 }, {});
+
+                // Helper: pull location from any object regardless of casing
+                const getCity = (obj) =>
+                    obj?.city || obj?.City || obj?.cityName || '';
+                const getAddress = (obj) =>
+                    obj?.address || obj?.Address || obj?.addressLine || '';
+                const getImage = (obj) =>
+                    obj?.image || obj?.Image || obj?.avatar || obj?.profile_image || '';
+                const getName = (obj) =>
+                    obj?.name || obj?.Name || '';
+                const getEmail = (obj) =>
+                    obj?.email || obj?.Email || '';
+                const getPhone = (obj) =>
+                    obj?.phone || obj?.Phone || obj?.phoneNumber || '';
 
                 const enrichedProviders = providerList.map(p => {
                     const providerServices = services.filter(s => Number(s.userid) === Number(p.id));
                     const mainCategoryId = providerServices[0]?.categoryId;
                     const specialty = categoryMap[mainCategoryId] || (providerServices.length > 0 ? "Service Provider" : null);
-                    
+
+                    // The User object may be nested as p.User or p.user
+                    const userObj = p.User || p.user || {};
+                    // Location: prefer top-level, fallback to nested User
+                    const city    = getCity(p)    || getCity(userObj);
+                    const address = getAddress(p) || getAddress(userObj);
+                    const phone   = getPhone(p)   || getPhone(userObj);
+                    const email   = getEmail(p)   || getEmail(userObj);
+                    const image   = getImage(p)   || getImage(userObj);
+                    const name    = getName(p)    || getName(userObj);
+
                     return {
                         ...p,
                         specialty,
                         servicesCount: providerServices.length,
                         rating: Number(p.rating || 0),
-                        points: Number(p.points || 0)
+                        points: Number(p.points || 0),
+                        city,
+                        address,
+                        phone,
+                        email,
+                        image: image || p.image,
+                        name:  name  || p.name,
                     };
                 });
 
@@ -114,28 +148,40 @@ const Providers = () => {
     return (
         <div className="bg-gray-50/50 min-h-screen pb-20">
              {/* Header Section */}
-             <div className="bg-[#04364A] py-28 px-6 relative overflow-hidden">
-                <div className="absolute inset-0">
-                    <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#64CCC5]/10 rounded-full blur-[120px]"></div>
-                    <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-[#176B87]/10 rounded-full blur-[120px]"></div>
+             <div className="bg-[#04364A] py-32 px-6 relative overflow-hidden">
+                <div className="absolute inset-0 z-0">
+                    <img src={providersBg} alt="background" className="w-full h-full object-cover opacity-20" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#04364A] via-transparent to-[#04364A]/80"></div>
+                    <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#64CCC5]/10 rounded-full blur-[120px] animate-pulse"></div>
+                    <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-[#176B87]/10 rounded-full blur-[120px] animate-pulse delay-700"></div>
+                    
+                    {/* Decorative floating bits */}
+                    <div className="absolute top-20 right-1/4 w-2 h-2 bg-[#64CCC5] rounded-full animate-float opacity-30"></div>
+                    <div className="absolute bottom-32 left-1/4 w-3 h-3 bg-white rounded-full animate-float delay-1000 opacity-20"></div>
                 </div>
                 
                 <div className="max-w-7xl mx-auto relative z-10">
-                    <div className="flex flex-col items-center text-center space-y-6">
+                    <div className="flex flex-col items-center text-center space-y-8">
                         <Link 
                             to="/" 
-                            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#64CCC5] hover:text-white transition-colors"
+                            className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] text-[#64CCC5] hover:text-white transition-all group animate-fade-in"
                         >
-                            <ArrowLeft size={14} /> Back to Home
+                            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> 
+                            Back to Home
                         </Link>
                         
-                        <h1 className="text-5xl md:text-7xl font-black text-white tracking-tight">
-                            Expert <span className="text-[#64CCC5]">Providers</span>
-                        </h1>
-                        
-                        <p className="text-[#DAFFFB]/60 text-lg max-w-2xl font-medium leading-relaxed">
-                            Browse through our verified network of professionals ready to help you with your next project.
-                        </p>
+                        <div className="space-y-4">
+                            <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter leading-none animate-fade-in delay-100">
+                                Expert <span className="text-[#64CCC5]">Providers.</span>
+                            </h1>
+                            
+                            <p className="text-[#DAFFFB]/60 text-xl max-w-2xl mx-auto font-medium leading-relaxed animate-fade-in delay-200">
+                                Connect with our network of verified professionals. 
+                                High-quality results.
+                            </p>
+                        </div>
+
+       
                     </div>
                 </div>
             </div>
@@ -224,7 +270,7 @@ const Providers = () => {
                                 <User size={24} className="text-[#64CCC5]" />
                             </div>
                         </div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#04364A]">Syncing Network...</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#04364A]">Syncing Providers...</p>
                     </div>
                 ) : paginatedProviders.length > 0 ? (
                     <>

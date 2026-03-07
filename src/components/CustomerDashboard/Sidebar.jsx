@@ -80,7 +80,7 @@ export default function Sidebar() {
   const navLinks = [
     { to: "/customer/customersm", icon: <MdOutlineCalendarMonth className="w-5 h-5 flex-shrink-0" />, text: "Customer Calender" },
     { to: "/customer/payout",     icon: <MdOutlinePayments      className="w-5 h-5 flex-shrink-0" />, text: "Payments" },
-    { to: "/customer/cashback",   icon: <MdOutlineHistory       className="w-5 h-5 flex-shrink-0" />, text: "Points Transation History" },
+
   ];
 
   return (
@@ -126,16 +126,7 @@ export default function Sidebar() {
         {/* Menu */}
         <div className="flex-1 overflow-y-auto px-3 py-4 no-scrollbar space-y-1 text-sm">
 
-          {/* Points — no active state (not a link) */}
-          <div className="flex items-center justify-between px-4 py-2 rounded-lg">
-            <div className="flex items-center gap-3">
-              <BsAward className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm">Points</span>
-            </div>
-            <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-              {points} LE
-            </span>
-          </div>
+
 
           {/* Home */}
           <Link to="/" className={linkClass("/", true)}>

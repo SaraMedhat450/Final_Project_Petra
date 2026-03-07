@@ -2,11 +2,22 @@ import React from 'react';
 import { MapPin, Phone, Mail, Calendar } from 'lucide-react';
 
 const ProviderInfoTab = ({ provider, availability = [] }) => {
-    // Sort availability by day of week if needed
     const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const sortedAvailability = [...availability].sort((a, b) => 
-        dayOrder.indexOf(a.day_of_week) - dayOrder.indexOf(b.day_of_week)
-    );
+    
+    // Improved availability check for "Always Available" state
+    const isAlwaysAvailable = availability.length === 0 || 
+                             availability.some(slot => slot.day_of_week?.toLowerCase() === 'all days' || slot.day_of_week === 'All Days');
+
+    const scheduleMap = availability.reduce((acc, slot) => {
+        if (slot.day_of_week) {
+            acc[slot.day_of_week.toLowerCase()] = slot;
+        }
+        return acc;
+    }, {});
+
+    const address = provider.address || provider.User?.address || provider.user?.address || '';
+    const city = provider.city || provider.User?.city || provider.user?.city || '';
+    const description = provider.description || provider.User?.description || provider.user?.description || '';
 
     return (
         <div className="bg-white p-12 rounded-[3rem] soft-shadow border border-gray-100 space-y-12 animate-in fade-in duration-500">
@@ -14,9 +25,9 @@ const ProviderInfoTab = ({ provider, availability = [] }) => {
             <div className="space-y-4">
                 <h3 className="text-xl font-black text-[#04364A] uppercase tracking-tight">Biography</h3>
                 <p className="text-gray-500 font-medium leading-relaxed">
-                    {provider.description || (
+                    {description || (
                         <>
-                            Verified professional providing services in <span className="text-[#04364A] font-bold">{provider.city || provider.address || 'Local Area'}</span>. 
+                            Verified professional providing services in <span className="text-[#04364A] font-bold">{city || address || 'Local Area'}</span>. 
                             Member since {provider.createdAt ? new Date(provider.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '2024'}. 
                             Committed to high-quality results and professional excellence.
                         </>
@@ -35,7 +46,7 @@ const ProviderInfoTab = ({ provider, availability = [] }) => {
                             </div>
                             <div className="pt-1">
                                 <p className="text-gray-400 text-[10px] uppercase font-black mb-0.5">Location</p>
-                                <span>{provider.address || 'Address not listed'}, {provider.city || 'City not listed'}</span>
+                                <span>{(address || city) ? `${address}${address && city ? ', ' : ''}${city}` : 'Address not listed'}</span>
                             </div>
                         </div>
                         <div className="flex items-start gap-4 text-sm font-bold text-[#04364A]">
@@ -70,32 +81,36 @@ const ProviderInfoTab = ({ provider, availability = [] }) => {
                         </span>
                     </div>
 
-                    <div className="space-y-4 bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
-                        <div className="flex items-center gap-3 text-sm font-bold text-[#04364A] mb-2">
-                            <Calendar size={18} className="text-[#64CCC5]" />
-                            <span>Weekly Schedule</span>
+                    <div className="space-y-6 bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3 text-sm font-bold text-[#04364A]">
+                                <Calendar size={18} className="text-[#64CCC5]" />
+                                <span>Weekly Schedule</span>
+                            </div>
+                            <span className="text-[8px] font-black uppercase text-[#176B87] tracking-[0.2em]">Operational Hours</span>
                         </div>
                         
-                        {sortedAvailability.length > 0 ? (
-                            <div className="space-y-3">
-                                {sortedAvailability.map((slot, idx) => (
-                                    <div key={idx} className="flex items-center justify-between text-xs">
-                                        <span className="font-black text-[#04364A]">{slot.day_of_week}</span>
-                                        <div className="flex items-center gap-2">
-                                            <span className="px-2 py-1 bg-white rounded-lg border border-gray-100 font-bold text-gray-500">
-                                                {slot.start_time} - {slot.end_time}
-                                            </span>
-                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        <div className="grid gap-2">
+                            {dayOrder.map((day) => {
+                                const slot = scheduleMap[day.toLowerCase()];
+                                const isOpen = isAlwaysAvailable || !!slot;
+                                return (
+                                    <div key={day} className={`flex items-center justify-between p-3 rounded-xl transition-all ${isOpen ? 'bg-white shadow-sm border border-gray-100' : 'opacity-40'}`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${isOpen ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                            <span className={`text-xs font-black ${isOpen ? 'text-[#04364A]' : 'text-gray-400'}`}>{day}</span>
                                         </div>
+                                        {isOpen ? (
+                                            <span className="text-[10px] font-bold text-gray-500 bg-gray-50 px-3 py-1 rounded-lg">
+                                                {isAlwaysAvailable ? 'Always Available' : `${slot.start_time} - ${slot.end_time}`}
+                                            </span>
+                                        ) : (
+                                            <span className="text-[9px] font-bold text-gray-300 uppercase tracking-tighter">Closed</span>
+                                        )}
                                     </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center py-4 text-center">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase">Always Available</p>
-                                <p className="text-[9px] text-gray-300 mt-1">Book services based on open slots</p>
-                            </div>
-                        )}
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>

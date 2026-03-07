@@ -7,6 +7,7 @@ import { Clock } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { loginStart, loginSuccess, loginFailure } from "@/store/slices/authSlice";
 import toast from 'react-hot-toast';
+import ServioLogo from "@/components/layout/ServioLogo";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -139,24 +140,19 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden bg-gray-50/50">
-      {/* Decorative Blobs */}
-      <div className="absolute top-0 -left-20 w-[600px] h-[600px] bg-[#64CCC5]/5 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-0 -right-20 w-[600px] h-[600px] bg-[#04364A]/5 rounded-full blur-[120px] pointer-events-none"></div>
-
-      <div className="w-full max-w-xl relative z-10">
-        <div className="bg-white shadow-2xl rounded-[3rem] p-10 sm:p-14 border border-white/20">
-          {/* Brand Logo */}
-          <div className="flex flex-col items-center mb-10">
-            <Link to="/" className="flex items-center gap-3 mb-6 group">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#04364A] shadow-xl shadow-[#04364A]/20 group-hover:scale-110 transition-transform duration-500">
-                <span className="text-[#64CCC5] font-black text-2xl">P</span>
-              </div>
+      <div className="w-full max-w-xl relative z-10 animate-fade-in">
+        <div className="bg-white/95 backdrop-blur-xl shadow-[0_32px_120px_-15px_rgba(4,54,74,0.3)] rounded-[3.5rem] p-10 sm:p-14 border border-white/20">
+          {/* Brand Logo & Header */}
+          <div className="flex flex-col items-center mb-12">
+            <Link to="/" className="mb-8 hover:scale-105 transition-transform duration-500">
+               <ServioLogo className="scale-125" />
             </Link>
 
-            <div className="text-center">
-              <h1 className="text-4xl font-black text-[#04364A] mb-3 tracking-tight">
-                Welcome Back
+            <div className="text-center space-y-2">
+              <h1 className="text-4xl md:text-5xl font-black text-[#04364A] tracking-tighter leading-none animate-fade-in delay-100">
+                Welcome Back.
               </h1>
+              
             </div>
           </div>
 

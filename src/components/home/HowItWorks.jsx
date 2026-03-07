@@ -25,10 +25,21 @@ const HowItWorks = () => {
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Header */}
-        <div className="text-center mb-16 space-y-4">
-          <h2 className="text-3xl font-black text-[#04364A] uppercase tracking-tight">How it works</h2>
-          <div className="w-16 h-1 bg-[#64CCC5] mx-auto rounded-full"></div>
-          <p className="text-gray-500 max-w-lg mx-auto">Getting things done is simple and fast. Follow these three easy steps.</p>
+        <div className="text-center mb-20 space-y-6">
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex items-center gap-3 text-[#64CCC5] animate-fade-in">
+                <div className="w-10 h-[2px] bg-[#64CCC5]"></div>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em]">Simplified Process</span>
+                <div className="w-10 h-[2px] bg-[#64CCC5]"></div>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-black text-[#04364A] tracking-tighter leading-none">
+              How <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#176B87] to-[#04364A]">It Works.</span>
+            </h2>
+          </div>
+          <p className="text-[#04364A]/50 max-w-lg mx-auto font-medium text-lg leading-relaxed">
+            Getting high-quality services is simpler than ever. 
+            Three steps away from excellence.
+          </p>
         </div>
 
         {/* Steps Grid */}

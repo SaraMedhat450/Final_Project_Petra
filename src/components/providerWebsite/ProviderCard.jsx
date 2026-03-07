@@ -46,22 +46,18 @@ const ProviderCard = ({ provider }) => {
             </div>
             
             <div className="flex items-center gap-1.5 mb-6 text-sm font-bold text-gray-400">
-                <MapPin size={14} className="text-[#64CCC5]" /> {provider.city || 'Location Pending'}
+                <MapPin size={14} className="text-[#64CCC5]" /> 
+                {provider.city || provider.user?.city || provider.User?.city || provider.address || 'Location Pending'}
             </div>
 
-            <div className="w-full grid grid-cols-3 gap-2 py-4 border-t border-b border-gray-50 mb-6">
+            <div className="w-full grid grid-cols-2 gap-2 py-4 border-t border-b border-gray-50 mb-6">
                 <div className="flex flex-col items-center">
                     <span className="flex items-center gap-1 text-amber-500 font-black text-sm">
                         <Star size={12} fill="currentColor" /> {provider.rating || '0.0'}
                     </span>
                     <span className="text-[8px] font-black uppercase tracking-widest text-gray-300">Rating</span>
                 </div>
-                <div className="flex flex-col items-center border-l border-r border-gray-50">
-                    <span className="flex items-center gap-1 text-[#04364A] font-black text-sm">
-                        <Award size={12} /> {provider.points || '0'}
-                    </span>
-                    <span className="text-[8px] font-black uppercase tracking-widest text-gray-300">Points</span>
-                </div>
+
                 <div className="flex flex-col items-center">
                     <span className="flex items-center gap-1 text-[#64CCC5] font-black text-sm uppercase">
                         <Zap size={12} /> {provider.status || 'Active'}

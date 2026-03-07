@@ -38,9 +38,19 @@ const TopProviders = ({ providers, loading }) => {
 
   return (
     <div className="relative">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-14">
-        <h2 className="text-4xl font-black text-[#04364A] tracking-tight">Providers</h2>
+      {/* Modernized Header */}
+      <div className="flex flex-col md:flex-row items-end md:items-center justify-between mb-16 px-4 gap-8">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 text-[#64CCC5] animate-fade-in">
+            <div className="w-12 h-[22px] rounded-full bg-[#64CCC5]/10 flex items-center justify-center">
+              <User size={12} strokeWidth={3} />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em]">Expert</span>
+          </div>
+          <h2 className="text-5xl md:text-6xl font-black text-[#04364A] tracking-tighter leading-none">
+            Top <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#176B87] to-[#04364A]">Providers.</span>
+          </h2>
+        </div>
         
         <div className="flex items-center gap-3">
           <div className="hidden md:flex gap-2">
