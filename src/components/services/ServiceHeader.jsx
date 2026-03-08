@@ -1,13 +1,16 @@
 import React from 'react';
 import { Zap, Sparkles, TrendingUp } from 'lucide-react';
-import servicesBg from '@/assets/services_bg.png';
 
 const ServiceHeader = ({ servicesCount }) => {
     return (
         <div className="bg-[#04364A] py-32 px-6 relative overflow-hidden">
             {/* Background Image & Overlay */}
             <div className="absolute inset-0 z-0">
-                <img src={servicesBg} alt="background" className="w-full h-full object-cover opacity-20" />
+                <img 
+                    src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=2000&q=80" 
+                    alt="background" 
+                    className="w-full h-full object-cover opacity-20" 
+                />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#04364A] via-[#04364A]/80 to-transparent"></div>
                 <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-[#64CCC5]/20 rounded-full blur-[120px] animate-pulse"></div>
                 <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#176B87]/30 rounded-full blur-[120px] animate-pulse delay-700"></div>

@@ -136,7 +136,8 @@ export default function ProviderServiceList() {
         userid: parseInt(service.userid),
         price_Type: service.price_Type || "Hourly",
         description: service.description || "",
-        commission_fee: parseFloat(service.commission_fee || 0)
+        commission_fee: parseFloat(service.commission_fee || 0),
+        _method: 'PUT'
       };
 
       await serviceService.updateService(service.id, updateData);

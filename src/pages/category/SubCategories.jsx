@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { Search, ArrowLeft, LayoutGrid, Star, Sparkles } from 'lucide-react';
 import { API_ENDPOINTS, COMMON_HEADERS, UPLOAD_URL } from '@/config/api';
-import subcategoriesBg from '@/assets/subcategories_bg.png';
 
 const SubCategories = () => {
     const location = useLocation();
@@ -56,7 +55,11 @@ const SubCategories = () => {
             {/* Header Section */}
             <div className="bg-[#04364A] py-32 px-6 relative overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <img src={subcategoriesBg} alt="background" className="w-full h-full object-cover opacity-20" />
+                    <img 
+                        src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=2000&q=80" 
+                        alt="background" 
+                        className="w-full h-full object-cover opacity-20" 
+                    />
                     <div className="absolute inset-0 bg-gradient-to-b from-[#04364A] via-transparent to-[#04364A]/80"></div>
                     <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-[#64CCC5]/10 rounded-full blur-[120px] animate-pulse"></div>
                     <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#176B87]/20 rounded-full blur-[120px] animate-pulse delay-700"></div>

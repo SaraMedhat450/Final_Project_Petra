@@ -74,6 +74,11 @@ const Contact = () => {
             {/* ── Hero Section ────────────────────────────────────────── */}
             <div className="bg-[#04364A] pt-32 pb-48 px-6 relative overflow-hidden">
                 <div className="absolute inset-0">
+                    <img 
+                        src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2000&q=80" 
+                        alt="background" 
+                        className="w-full h-full object-cover opacity-10" 
+                    />
                     <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-[#64CCC5]/10 rounded-full blur-[120px]"></div>
                     <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#176B87]/10 rounded-full blur-[120px]"></div>
                 </div>

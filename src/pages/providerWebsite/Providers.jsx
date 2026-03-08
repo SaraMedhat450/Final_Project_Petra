@@ -7,7 +7,6 @@ import {
 import { API_ENDPOINTS, COMMON_HEADERS, UPLOAD_URL } from '@/config/api';
 import ProviderCard from '@/components/providerWebsite/ProviderCard';
 import { Link } from 'react-router-dom';
-import providersBg from '@/assets/providers_bg.png';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -150,7 +149,11 @@ const Providers = () => {
              {/* Header Section */}
              <div className="bg-[#04364A] py-32 px-6 relative overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <img src={providersBg} alt="background" className="w-full h-full object-cover opacity-20" />
+                    <img 
+                        src="https://images.unsplash.com/photo-1521791136064-7986c2923216?auto=format&fit=crop&w=2000&q=80" 
+                        alt="background" 
+                        className="w-full h-full object-cover opacity-20" 
+                    />
                     <div className="absolute inset-0 bg-gradient-to-b from-[#04364A] via-transparent to-[#04364A]/80"></div>
                     <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#64CCC5]/10 rounded-full blur-[120px] animate-pulse"></div>
                     <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-[#176B87]/10 rounded-full blur-[120px] animate-pulse delay-700"></div>

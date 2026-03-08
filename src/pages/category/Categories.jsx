@@ -3,7 +3,6 @@ import { Search, Grid, List, ChevronRight,ChevronLeft } from 'lucide-react';
 import { API_ENDPOINTS, COMMON_HEADERS } from '@/config/api';
 import CategoryCard from '@/components/category/CategoryCard';
 import { Link } from 'react-router-dom';
-import categoriesBg from '@/assets/categories_bg.png';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
@@ -83,7 +82,11 @@ const Categories = () => {
              {/* Header Section */}
              <div className="bg-[#04364A] py-32 px-6 relative overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <img src={categoriesBg} alt="background" className="w-full h-full object-cover opacity-15" />
+                    <img 
+                        src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=2000&q=80" 
+                        alt="background" 
+                        className="w-full h-full object-cover opacity-15" 
+                    />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#04364A] via-transparent to-[#04364A]"></div>
                     <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-[#64CCC5]/10 rounded-full blur-[120px] animate-pulse"></div>
                     <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#176B87]/20 rounded-full blur-[120px] animate-pulse delay-700"></div>
